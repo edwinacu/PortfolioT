@@ -87,6 +87,7 @@
 \begin{center}
 \vspace*{\QuarterPage}
 {\large Portafolio } \\
+{\Medium Edwin Acuña } \\
 \end{center}
 \end{titlepage}
 
