@@ -1,0 +1,28 @@
+\select@language {spanish}
+\contentsline {section}{\numberline {1}Resumen ejecutivo}{1}{section.1}
+\contentsline {section}{\numberline {2}Calculo de Rendimientos y Estad\IeC {\'\i }stica Descriptiva}{2}{section.2}
+\contentsline {subsection}{\numberline {2.1}Tendencias de Tiempo de los Precios y Retornos de los Activos}{2}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Retornos Acumulados (Equity Curve)}{3}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Normalidad de Retornos Continuos}{4}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}Estad\IeC {\'\i }stica Descriptiva}{5}{subsection.2.4}
+\contentsline {subsection}{\numberline {2.5}Pendiente Sharpe}{6}{subsection.2.5}
+\contentsline {subsection}{\numberline {2.6}Errores Estandar}{6}{subsection.2.6}
+\contentsline {subsection}{\numberline {2.7}Intervalos de Confianza (95\unskip $\mathsurround \z@ \tmspace +\thinmuskip {.1667em}$\percentsign {}) de los estimados de las desviaciones est\'andar ($\displaystyle \mathaccentV {hat}05E{\sigma }$) y de las medias ($\displaystyle \mathaccentV {hat}05E{\mu }$)}{7}{subsection.2.7}
+\contentsline {subsection}{\numberline {2.8}Bootstrap - Remuestreo}{8}{subsection.2.8}
+\contentsline {section}{\numberline {3}Value-at-Risk(VaR)}{10}{section.3}
+\contentsline {subsection}{\numberline {3.1}VaR Parametrico}{10}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}VaR no Param\'etrico/Simulaci\'on Hist\'orica}{10}{subsection.3.2}
+\contentsline {section}{\numberline {4}Teor\IeC {\'\i }a de Portafolios}{11}{section.4}
+\contentsline {subsection}{\numberline {4.1}Portafolio Global de la m\IeC {\'\i }nima varianza con cortos}{11}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Portafolio eficiente}{11}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}Portafolio de la Tangente con cortos}{12}{subsection.4.3}
+\contentsline {subsection}{\numberline {4.4}Frontera Eficiente}{12}{subsection.4.4}
+\contentsline {subsection}{\numberline {4.5}Pesos de Portafolios Eficientes sin Activos libres de Riesgo(T-Bills)}{13}{subsection.4.5}
+\contentsline {subsection}{\numberline {4.6}Pesos de Portafolios Eficientes con Activos libres de Riesgo (T-Bills)}{13}{subsection.4.6}
+\contentsline {subsection}{\numberline {4.7}Portafolio Global de la m\IeC {\'\i }nima varianza sin cortos}{14}{subsection.4.7}
+\contentsline {subsection}{\numberline {4.8}Portafolio de la Tangente sin cortos}{14}{subsection.4.8}
+\contentsline {section}{\numberline {5}Asignaci\'on de Activos}{15}{section.5}
+\contentsline {subsection}{\numberline {5.1}Portafolio Eficiente Retorno Objetivo 9$\unskip $\mathsurround \z@ \tmspace +\thinmuskip {.1667em}$\percentsign {}$ anual}{15}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Portafolio Eficiente Retorno Objetivo 9$\unskip $\mathsurround \z@ \tmspace +\thinmuskip {.1667em}$\percentsign {}$ anual (Combinaci\'on T-Bill y Portafolio de la Tangente sin cortos)}{15}{subsection.5.2}
+\contentsline {section}{\numberline {6}Risk Budgeting - Portafolio Eficiente(E[Rp]=9$\unskip $\mathsurround \z@ \tmspace +\thinmuskip {.1667em}$\percentsign {}$)}{16}{section.6}
+\contentsline {section}{\numberline {7}Ap\'endice}{17}{section.7}

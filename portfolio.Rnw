@@ -88,6 +88,8 @@
 \vspace*{\QuarterPage}
 {\large Portafolio } \\
 {\Medium Edwin Acuña } \\
+\vspace*{\QuarterPage}
+{\Medium 2014 } \\
 \end{center}
 \end{titlepage}
 
