@@ -1,0 +1,966 @@
+\documentclass[11pt,spanish]{article}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+\usepackage[spanish]{babel} %config en español
+
+\usepackage[T1]{fontenc}  %acentos en español
+\usepackage{selinput}
+\SelectInputMappings{
+  aacute={á},
+  ntilde={ñ}
+}
+
+\usepackage[margin=2.54cm,        % margenes
+            letterpaper]{geometry}  
+
+
+\usepackage{hyperref} % para generar una tabla de contenido con hipervinculos
+\hypersetup{
+    colorlinks,
+    citecolor=black,   % establece los colores de los links
+    filecolor=black,
+    linkcolor=black,   % remueve las cajas rojas
+    urlcolor=black
+}
+
+
+\usepackage{titlesec}    % se centran todas las secciones
+\titleformat*{\section}{\centering\normalfont\large\bfseries}
+
+\usepackage{setspace}
+%\doublespacing        % doble espaciado
+ \linespread{1.3}      % uno y medio espaciado (alternativo)
+% \linespread{1.6}     % doble espaciado (alternativo)
+
+\raggedright  % justificar a la izquierda
+
+%\usepackage{parskip}
+%\setlength{\parindent}{0pt} % no funciona eliminar indentacion
+
+\usepackage{mathptmx}  % fuente Times New Roman
+
+\newlength{\QuarterPage}          % define el espaciado del titulo
+\setlength{\QuarterPage}{2.5in}
+\newlength{\Twolines}
+\setlength{\Twolines}{0.8in}      % define el espaciado del titulo
+
+\usepackage{mathtools}           % herramientas para ecuaciones
+
+% \pagestyle{plain}
+%  \pagestyle{headings}
+
+%\usepackage{caption}
+%\captionsetup{labelfont=bf}
+
+%\captionsetup[figure]{font=small,skip=0pt}     % Ajusta el espaciado del caption
+%\captionsetup[table]{font=small} % Ajusta solo la letra del caption
+
+
+
+\newcommand{\squeezeup}{\vspace{-30mm}}   % reducir el espacio antes/despues figuras
+
+\usepackage{newverbs}      % generar letra tipo verbatim
+
+\usepackage{xcolor}
+\newverbcommand{\bverb}
+  {\begin{lrbox}{\verbbox}}
+  {\end{lrbox}\colorbox{gray!7}{\box\verbbox}}  % genera texto verbatim con fondo gris
+
+\usepackage{longtable} % tablas largas
+
+\usepackage{subfig}   % subfiguras (afecta el espaciado de los captions de las figuras y tablas)
+%\usepackage{subcaption} % alternativo subfiguras
+
+\usepackage{booktabs}   % opciones para tablas xtable y hmisc(latex)
+
+\usepackage{floatrow}
+\newfloatcommand{capbtabbox}{table}[][\FBwidth] % caption tamaño de la figura/tabla
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Documento Principal
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+\begin{titlepage}
+\begin{center}
+\vspace*{\QuarterPage}
+{\large Portafolio } \\
+\end{center}
+\end{titlepage}
+
+\thispagestyle{empty}  % elimino el numero de la pagina
+
+%--------------------------------------------------------------------------------------
+%  Tabla de contenido
+%-------------------------------------------------------------------------------------
+
+
+\newpage
+\tableofcontents
+\thispagestyle{empty}
+
+%--------------------------------------------------------------------------------------
+%  Secciones del trabajo
+%-------------------------------------------------------------------------------------
+
+\newpage
+\setcounter{page}{1} % incializa el conteo de las paginas
+\section{Resumen ejecutivo}
+\label{Resumen}
+
+\newpage
+\section{Calculo de Rendimientos y Estadística Descriptiva}
+\label{EstaDescrip}
+\subsection{Tendencias de Tiempo de los Precios y Retornos de los Activos}
+
+
+
+\begin{figure}[h]
+
+
+{\centering \includegraphics[width=8.1cm,height=8cm]{figure/precios1} 
+\includegraphics[width=8.1cm,height=8cm]{figure/precios2} 
+
+}
+
+\caption[Precios y Retornos Mensuales]{Precios y Retornos Mensuales\label{fig:precios}}
+\end{figure}
+
+
+Los fondos mutuos que replican indices de diferentes países como el indice del S\&P 500
+(vfinx), el indice Europeo de acciones (veurx) y el índice de países emergentes (veiex)
+parecen moverse en la misma dirección. Por ejemplo estos indices cayeron aproximadamente en el tercer trimestre del 2011. En cuanto al índice de bonos a largo plazo(vbltx) parece tener una tendencia alcista hasta el 2012 y  a partir de este año tiene tendencia horizontal y bajista. A partir del cuarto trimestre la acción de Adobe parece presentar una tendencia alcista mayor que la de la acción de Oracle. 
+
+En cuanto a los rendimientos continuos de los tres fondos estos presentan una fluctuación alrededor de su media hasta la mitad del año 2011 después se observa que caen los rendimientos dramáticamente a partir del segundo trimestre del 2011,  para volver a recuperarse a finales del año 2011, vuelven a acaer aproximadamente a partir del segundo trimestre del 2012 y fluctuan alrededor de su media hasta finales del 2013. El índice de bonos a largo plazo ha fluctuado alrededor de su media pero a mediados del 2013 cayó considerablemente. El rendimiento de la acción de Oracle tuvo su pico a finales del 2010 pero presentó una fuerte caida a finales del 2011, principios del 2012.
+
+\newpage
+\subsection{Retornos Acumulados (Equity Curve)}
+\textbf{Crecimiento de \$1 a través del tiempo}
+\begin{figure}[h]
+
+
+{\centering \includegraphics[width=\maxwidth]{figure/Crecimiento} 
+
+}
+
+\caption[Retornos Acumulados]{Retornos Acumulados\label{fig:Crecimiento}}
+\end{figure}
+
+
+Se observa en la gráfica que un dólar invertido al comienzo del 2009 genera mayor retorno en la inversión en Adobe Inc. que en cualquier otro activo, de hecho ha generado aproximadamente un 150\% de retorno acumulado hasta finales del 2013. El índice (vfinx) también ha generado un retorno acumulado bastante alto de aproximadamente 130\%. Por otro lado el activo que ha generado el peor retorno acumulado ha sido el índice de bonos a largo plazo (vbltx) el cual generó un retorno acumulado aproximado de  40\%.
+\vspace*{10pt}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrrrrrr}
+  \hline
+ & vbltx & adbe & orcl & veurx & veiex & vfinx \\ 
+  \hline
+Cumulative Return & 0.412 & 1.515 & 1.004 & 0.895 & 0.832 & 1.328 \\ 
+   \hline
+\end{tabular}
+\caption{Retornos Acumulados} 
+\end{table}
+
+
+\newpage
+\subsection{Normalidad de Retornos Continuos}
+
+
+
+
+\begin{figure}[!hbt]
+\captionsetup[subfloat]{farskip=2pt,nearskip=-3pt}
+\centering
+\subfloat[Vbltx\label{fig:Diagnosticos1}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos1.pdf}}}
+\subfloat[Vbltx\label{fig:Diagnosticos2}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos2.pdf}}}
+\subfloat[Vbltx\label{fig:Diagnosticos3}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos3.pdf}}}
+\subfloat[Vbltx\label{fig:Diagnosticos4}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos4.pdf}}}
+
+
+\subfloat[Adbe\label{fig:Diagnosticos5}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos5.pdf}}}
+\subfloat[Adbe\label{fig:Diagnosticos6}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos6.pdf}}}
+\subfloat[Adbe\label{fig:Diagnosticos7}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos7.pdf}}}
+\subfloat[Adbe\label{fig:Diagnosticos8}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos8.pdf}}}
+
+\subfloat[orcl\label{fig:Diagnosticos9}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos9.pdf}}}
+\subfloat[orcl\label{fig:Diagnosticos10}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos10.pdf}}}
+\subfloat[orcl\label{fig:Diagnosticos11}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos11.pdf}}}
+\subfloat[orcl\label{fig:Diagnosticos12}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos12.pdf}}}
+
+\subfloat[veurx\label{fig:Diagnosticos13}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos13.pdf}}}
+\subfloat[veurx\label{fig:Diagnosticos14}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos14.pdf}}}
+\subfloat[veurx\label{fig:Diagnosticos15}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos15.pdf}}}
+\subfloat[veurx\label{fig:Diagnosticos16}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos16.pdf}}}
+
+\subfloat[veiex\label{fig:Diagnosticos17}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos17.pdf}}}
+\subfloat[veiex\label{fig:Diagnosticos18}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos18.pdf}}}
+\subfloat[veiex\label{fig:Diagnosticos19}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos19.pdf}}}
+\subfloat[veiex\label{fig:Diagnosticos20}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos20.pdf}}}
+
+\subfloat[vfinx\label{fig:Diagnosticos21}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos21.pdf}}}
+\subfloat[vfinx\label{fig:Diagnosticos22}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos22.pdf}}}
+\subfloat[vfinx\label{fig:Diagnosticos23}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos23.pdf}}}
+\subfloat[vfinx\label{fig:Diagnosticos24}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos24.pdf}}}
+\vspace*{10pt}
+\caption[Diagnosticos Estadísticos]{Diagnosticos Estadísticos\label{fig:Diagnosticos}}
+\end{figure}
+Los gráficos de diagnósticos contienen histogramas, gráficos de densidad suavizados, Diagrama de cajas y gráficos QQ , son utilizados para determinar si los retornos están normalmente distribuidos.
+
+\newpage
+\subsection{Estadística Descriptiva}
+\begin{table}[ht]
+\centering
+\scalebox{0.8}{
+\begin{tabular}{rlrlrrrr}
+  \hline
+ & $\hat{\mu}$ & $\hat{\sigma}^2$ & $\hat{\sigma}$ & Skew & E. Kurtosis &  Cuantil $1\%$ & Cuantil $5\%$ \\ 
+  \hline
+Fondo Bonos a largo plazo:vbltx & 0.62\% & 0.001 & 2.52\% & 0.060 & -0.370 & -0.050 & -0.030 \\ 
+  Adobe Inc:adbe & 1.92\% & 0.007 & 8.43\% & 0.205 & 0.909 & -0.166 & -0.127 \\ 
+  Oracle Corp:orcl & 1.47\% & 0.006 & 7.55\% & -0.176 & 0.313 & -0.164 & -0.096 \\ 
+  Indice Europeo Vanguard:veurx & 1.29\% & 0.004 & 6.36\% & -0.361 & -0.194 & -0.129 & -0.113 \\ 
+  Mercados Emergentes Vanguard:veiex & 1.24\% & 0.004 & 6.62\% & 0.075 & 0.424 & -0.142 & -0.091 \\ 
+  Indice SP500 Vanguard:vfinx & 1.54\% & 0.002 & 4.40\% & -0.596 & 0.390 & -0.096 & -0.063 \\ 
+   \hline
+\end{tabular}
+}
+\caption{Estadísticos Retornos Mensuales} 
+\label{tabrescaled}
+\end{table}
+
+Estos Son los estimados de los parametros del modelo de retorno constante(CER). Se observa que los indices veurx ,vfinx y la acción de Oracle corp.(orcl) presentan sesgo negativo , mientras que los otros activos presentan sesgo positivo. En cuanto a las densidades la acción de oracle parece tener una distibución normal apoyada por el grafico QQ. Los retornos de veurx no estan tan normalmente distribuidos.
+
+
+\vspace*{10pt}
+\begin{table}[ht]
+\centering
+\scalebox{0.9}{
+\begin{tabular}{rrrrrrr}
+  \hline
+ & vbltx & adbe & orcl & veurx & veiex & vfinx \\ 
+  \hline
+Riesgo/Retorno & 0.245 & 0.228 & 0.194 & 0.203 & 0.188 & 0.350 \\ 
+   \hline
+\end{tabular}
+}
+\caption{Riesgo/Retorno ratios} 
+\label{tabrescaled}
+\end{table}
+
+
+Se observa que el activo con mejor ratio riesgo/retorno es el fondo de S\&P500 (vfinx) y el de peor es la acción de Oracle corp.(orcl)
+\vspace*{-15pt}
+\begin{figure}[h]
+
+\includegraphics[width=\maxwidth]{figure/graficor_r} \caption[Riesgo-Retorno Tradeoff ]{Riesgo-Retorno Tradeoff \label{fig:graficor.r}}
+\end{figure}
+
+
+
+\newpage\subsection{Pendiente Sharpe}
+\begin{table}[ht]
+\centering
+\scalebox{0.9}{
+\begin{tabular}{rrrrrrr}
+  \hline
+ & vbltx & adbe & orcl & veurx & veiex & vfinx \\ 
+  \hline
+Sharpe Ratio & 0.229 & 0.223 & 0.189 & 0.196 & 0.182 & 0.340 \\ 
+   \hline
+\end{tabular}
+}
+\caption{Sharpe Ratio por Activo} 
+\label{tabrescaled}
+\end{table}
+
+La pendiente Sharpe es el excedente del retorno esperado por unidad de riesgo, en otras palabras es la prima de riesgo en el activo por unidad de riesgo. Para el calculo de la pendiente se ha utilizado un activo libre de riesgo (rf)= \ensuremath{4.1667\times 10^{-4}}.El activo con la mayor pendiente es el fondo de S\&P 500 (vfinx), quiere decir esto que un inversionista preferira un activo con un Sharpe Ratio alto a uno con un ratio bajo.
+
+\subsection{Errores Estandar}
+
+\begin{table}[ht]
+\centering
+\scalebox{0.9}{
+\begin{tabular}{ccccccc}
+  \hline
+ & $\hat{\mu}$ & $SE_{\hat{\mu}}$ & $\hat{\sigma}^2$ & $SE_{\hat{\sigma}^2}$ & $\hat{\sigma}$ & $SE_{\hat{\sigma}}$ \\ 
+  \hline
+vbltx & 0.0062 & 0.0033 & 0.0006 & 0.0001 & 0.0252 & 0.0023 \\ 
+  adbe & 0.0192 & 0.0110 & 0.0071 & 0.0013 & 0.0843 & 0.0078 \\ 
+  orcl & 0.0147 & 0.0098 & 0.0057 & 0.0011 & 0.0755 & 0.0070 \\ 
+  veurx & 0.0129 & 0.0083 & 0.0040 & 0.0007 & 0.0636 & 0.0059 \\ 
+  veiex & 0.0124 & 0.0086 & 0.0044 & 0.0008 & 0.0662 & 0.0061 \\ 
+  vfinx & 0.0154 & 0.0057 & 0.0019 & 0.0004 & 0.0440 & 0.0040 \\ 
+   \hline
+\end{tabular}
+}
+\caption{Errores Estandar de Estimados} 
+\label{Errores.E}
+\end{table}
+
+
+Como se puede observar en el Cuadro \ref{Errores.E} los valores estimados de ($\displaystyle\hat{\mu}$) presentan errores estándar muy grandes comparados con los valores estimados de ($\displaystyle\hat{\sigma}$). Es útil comparar la magnitud del error estándar (SE) con el valor del estimado para evaluar que tan preciso es el estimado. Como se observa en el Cuadro \ref{Precision.se} los estimados de los retornos esperados ($\displaystyle\hat{\mu}$) son aproximadamente de 1.4 a 2.68 veces sus respectivos errores 
+
+\begin{table}[ht]
+\centering
+\scalebox{0.9}{
+\begin{tabular}{ccc}
+  \hline
+ & $\hat{\rho}$ & $SE_{\hat{\rho}}$ \\ 
+  \hline
+adbe,vbltx & -0.2362 & 0.1229 \\ 
+  orcl,vbltx & -0.2888 & 0.1193 \\ 
+  veurx,vbltx & -0.2322 & 0.1232 \\ 
+  veiex,vbltx & -0.1603 & 0.1268 \\ 
+  vfinx,vbltx & -0.2856 & 0.1196 \\ 
+  orcl,adbe & 0.4985 & 0.0978 \\ 
+  veurx,adbe & 0.6426 & 0.0764 \\ 
+  veiex,adbe & 0.6233 & 0.0796 \\ 
+  vfinx,adbe & 0.7374 & 0.0594 \\ 
+  veurx,orcl & 0.7063 & 0.0652 \\ 
+  veiex,orcl & 0.6145 & 0.0810 \\ 
+  vfinx,orcl & 0.6935 & 0.0676 \\ 
+  veiex,veurx & 0.8785 & 0.0297 \\ 
+  vfinx,veurx & 0.8954 & 0.0258 \\ 
+  vfinx,veiex & 0.8114 & 0.0445 \\ 
+   \hline
+\end{tabular}
+}
+\caption{Errores Estandar de Coeficientes de Correlación} 
+\label{tabrescaled}
+\end{table}
+
+
+\newpage
+estándar, en cambio si se observan los estimados de las desviaciones estándar ($\displaystyle\hat{\sigma}$) son aproximadamente 10.8 veces sus respectivos errores estándar. La evidencia anterior destaca la mayor precisión que presentan los estimados de las desviaciones estándar ($\displaystyle\hat{\sigma}$) que los estimados de los retornos esperados ($\displaystyle\hat{\mu}$).
+
+\begin{table}[ht]
+\centering
+\scalebox{0.9}{
+\begin{tabular}{ccc}
+  \hline
+ & $\hat{\mu}/SE_{\hat{\mu}}$ & $\hat{\sigma}/SE_{\hat{\sigma}}$ \\ 
+  \hline
+vbltx & 1.886 & 10.863 \\ 
+  adbe & 1.748 & 10.863 \\ 
+  orcl & 1.491 & 10.863 \\ 
+  veurx & 1.558 & 10.863 \\ 
+  veiex & 1.444 & 10.863 \\ 
+  vfinx & 2.686 & 10.863 \\ 
+   \hline
+\end{tabular}
+}
+\caption{Precisión de los Errores Estandar} 
+\label{Precision.se}
+\end{table}
+
+
+\subsection{Intervalos de Confianza (95\%) de los estimados de las desviaciones estándar ($\displaystyle\hat{\sigma}$) y de las medias ($\displaystyle\hat{\mu}$)}
+
+\begin{table}[ht]
+\centering
+\scalebox{0.9}{
+\begin{tabular}{cccc|ccc}
+  \hline
+ & $\mu$ Inferior & $\mu$ Superior & $\mu$ Ancho & $\sigma$ Inferior & $\sigma$ Superior & $\sigma$ Ancho \\ 
+  \hline
+vbltx & -0.0004 & 0.0127 & 0.0131 & 0.0205 & 0.0298 & 0.0093 \\ 
+  adbe & -0.0028 & 0.0411 & 0.0439 & 0.0688 & 0.0998 & 0.0310 \\ 
+  orcl & -0.0050 & 0.0343 & 0.0393 & 0.0616 & 0.0894 & 0.0278 \\ 
+  veurx & -0.0037 & 0.0294 & 0.0331 & 0.0519 & 0.0753 & 0.0234 \\ 
+  veiex & -0.0048 & 0.0297 & 0.0345 & 0.0540 & 0.0784 & 0.0244 \\ 
+  vfinx & 0.0039 & 0.0268 & 0.0229 & 0.0359 & 0.0521 & 0.0162 \\ 
+   \hline
+\end{tabular}
+}
+\caption{Intervalos de Confianza de $\mu$ y $\displaystyle \sigma$ } 
+\label{IC}
+\end{table}
+
+\begin{itemize}
+  \item  Los Intervalos de confianza (95\%) de la media son muy anchos $\Rightarrow$ Estimado impreciso.
+  \item  El ancho de los intervalos es grande con respecto al tamaño del estimado de la media de los activos
+  \item  Los Intervalos de confianza (95\%) de la desviación estándar son angostos $\Rightarrow$ Estimado preciso.
+  \item  El ancho de los intervalos es pequeño con respecto al tamaño del estimado de las desviaciones estándar de los activos. 
+\end{itemize}
+
+   
+\newpage\subsection{Bootstrap - Remuestreo}
+\textbf{Bootstrap Media}    
+
+\begin{table}[ht]
+\centering
+\scalebox{0.9}{
+\begin{tabular}{cccccc}
+  \hline
+ & $\hat{\mu}$ & $_{boot}\mu$ & $SE_{\displaystyle\hat{\mu}}$ & $SE_{boot}\mu$ & bias \\ 
+  \hline
+vbltx & 0.00618 & 0.00623 & 0.00327 & 0.00325 & 0.00005 \\ 
+  adbe & 0.01918 & 0.01948 & 0.01097 & 0.01074 & 0.00030 \\ 
+  orcl & 0.01466 & 0.01468 & 0.00983 & 0.00962 & 0.00001 \\ 
+  veurx & 0.01289 & 0.01265 & 0.00828 & 0.00833 & -0.00024 \\ 
+  veiex & 0.01245 & 0.01265 & 0.00862 & 0.00848 & 0.00015 \\ 
+  vfinx & 0.01538 & 0.01524 & 0.00573 & 0.00580 & -0.00014 \\ 
+   \hline
+\end{tabular}
+}
+\caption{Estimados del Bootstrap de la media} 
+\label{meanboot}
+\end{table}
+
+\textbf{Ventajas Bootstrap}
+\begin{itemize}
+  \item Menos supuestos: No necesita datos que estén normalmente distribuidos
+  \item Mayor precisión: No depende de muestras de tamaño grande a diferencia del Teorema Central del Límite
+  \item Generalidad: El mismo método aplica para un variado rango de estadísticos.
+\end{itemize}
+
+Es un buen indicio que los estimados de $SE_{\displaystyle\hat{\mu}}$ y $SE_{boot}\mu$ 
+presenten valores tan cercanos como se observa en el Cuadro \ref{meanboot}. Lo anterior supone que ambos son estimados confiables con respecto a la incertidumbre en los estimados de los parametros.
+
+\textbf{Bootstrap Desviación Estándar} 
+\begin{table}[ht]
+\centering
+\scalebox{0.9}{
+\begin{tabular}{cccccc}
+  \hline
+ & $\hat{\sigma}$ & $_{boot}\sigma$ & $SE_{\displaystyle\hat{\sigma}}$ & $SE_{boot}\sigma$ & bias \\ 
+  \hline
+vbltx & 0.02515 & 0.02493 & 0.00232 & 0.00208 & 0.01875 \\ 
+  adbe & 0.08428 & 0.08256 & 0.00776 & 0.00926 & -0.00172 \\ 
+  orcl & 0.07554 & 0.07477 & 0.00695 & 0.00768 & -0.00077 \\ 
+  veurx & 0.06356 & 0.06238 & 0.00585 & 0.00561 & -0.00118 \\ 
+  veiex & 0.06621 & 0.06238 & 0.00610 & 0.00675 & -0.00101 \\ 
+  vfinx & 0.04398 & 0.04325 & 0.00405 & 0.00435 & -0.00014 \\ 
+   \hline
+\end{tabular}
+}
+\caption{Estimados del Bootstrap de la Desviación Estándar} 
+\label{sigmaboot}
+\end{table}
+
+
+\newpage
+\textbf{Bootstrap Intervalos de confianza de la media} 
+\captionsetup{format=plain,justification=centerlast}
+\begin{table}[ht]
+\centering
+\scalebox{0.9}{
+\begin{tabular}{ccccc}
+  \hline
+ & $_{boot}\mu$ Inferior & $_{boot}\mu$ Superior & $\mu$ Inferior$ & $\mu$ Superior \\ 
+  \hline
+vbltx & -0.00025 & 0.01249 & -0.00037 & 0.01273 \\ 
+  adbe & -0.00216 & 0.03993 & -0.00276 & 0.04113 \\ 
+  orcl & -0.00421 & 0.03351 & -0.00501 & 0.03433 \\ 
+  veurx & -0.00319 & 0.02945 & -0.00366 & 0.02944 \\ 
+  veiex & -0.00433 & 0.02892 & -0.00480 & 0.02969 \\ 
+  vfinx & 0.00415 & 0.02689 & 0.00393 & 0.02683 \\ 
+   \hline
+\end{tabular}
+}
+\caption{Estimados del Bootstrap de los Intervalos de Confianza de la media} 
+\label{muboot.ci}
+\end{table}
+
+
+\textbf{Bootstrap Intervalos de confianza Desviación Estándar} 
+\begin{table}[ht]
+\centering
+\scalebox{0.9}{
+\begin{tabular}{ccccc}
+  \hline
+ & $_{boot}\sigma$ Inferior & $_{boot}\sigma$ Superior & $\sigma$ Inferior$ & $\sigma$ Superior \\ 
+  \hline
+vbltx & 0.02130 & 0.02947 & 0.02052 & 0.02979 \\ 
+  adbe & 0.06785 & 0.10414 & 0.06876 & 0.09979 \\ 
+  orcl & 0.06126 & 0.09136 & 0.06163 & 0.08945 \\ 
+  veurx & 0.05375 & 0.07575 & 0.05186 & 0.07527 \\ 
+  veiex & 0.05400 & 0.08044 & 0.05402 & 0.07840 \\ 
+  vfinx & 0.03618 & 0.05323 & 0.03588 & 0.05208 \\ 
+   \hline
+\end{tabular}
+}
+\caption{Estimados del Bootstrap de los Intervalos de Confianza de la Desviación Estándar} 
+\label{sdboot.ci}
+\end{table}
+
+
+\newpage
+\section{Value-at-Risk(VaR)}
+\subsection{VaR Parametrico}
+\begin{itemize}
+  \item Especifica una distribución paramétrica para los retornos
+  \item Estima parámetros de distribución
+  \item Estima medidas de riesgo como funciones de los parámetros estimados
+\end{itemize}
+
+
+\begin{table}[ht]
+\centering
+\scalebox{0.9}{
+\begin{tabular}{ccccc}
+  \toprule
+ & VaR$1\%$ & VaR$5\%$ & VaR$1\%$ Anual & VaR$5\%$ Anual \\ 
+  \midrule
+vbltx & -5099.75 & -3458.85 & -70001.76 & -56377.92 \\ 
+  adbe & -16211.60 & -11258.40 & -87867.72 & -75924.10 \\ 
+  orcl & -14876.84 & -10379.88 & -86983.49 & -75095.02 \\ 
+  veurx & -12626.84 & -8758.73 & -84696.09 & -72248.03 \\ 
+  veiex & -13202.22 & -9195.87 & -85402.42 & -73202.06 \\ 
+  vfinx & -8326.09 & -5536.89 & -77808.61 & -63592.11 \\ 
+   \bottomrule
+\end{tabular}
+}
+\caption{VaR$1\%$,$5\%$ Mensual y Anual} 
+\label{VaR}
+\end{table}
+
+
+
+\subsection{VaR no Paramétrico/Simulación Histórica}
+\begin{itemize}
+  \item Usa la distribución histórica para estimar las medidas de riesgo (VaR)
+\end{itemize}
+
+
+\begin{table}[ht]
+\centering
+\scalebox{0.9}{
+\begin{tabular}{ccccc}
+  \toprule
+ & $\hat{q}_{0.01}^R$ & $\hat{q}_{0.05}^R$ & $VaR_{0.01}^{HS}$ & $VaR_{0.05}^{HS}$ \\ 
+  \midrule
+vbltx & -0.05 & -0.03 & -4878.04 & -2960.42 \\ 
+  adbe & -0.17 & -0.13 & -15260.83 & -11920.80 \\ 
+  orcl & -0.16 & -0.10 & -15087.66 & -9174.84 \\ 
+  veurx & -0.13 & -0.11 & -12076.24 & -10686.46 \\ 
+  veiex & -0.14 & -0.09 & -13249.52 & -8656.49 \\ 
+  vfinx & -0.10 & -0.06 & -9119.43 & -6118.79 \\ 
+   \bottomrule
+\end{tabular}
+}
+\caption{$VaR_{0.01}^{HS}$ , $VaR_{0.05}^{HS}$ mensual Simulación \\ Histórica } 
+\end{table}
+
+
+
+\newpage\section{Teoría de Portafolios}
+\subsection{Portafolio Global de la mínima varianza con cortos}
+
+
+\begin{figure}[!h]
+\CenterFloatBoxes   % alinea las cajas verticalmente
+\begin{floatrow}
+\ffigbox{
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/gmv_s} 
+
+\end{knitrout}
+}{\caption{Pesos de activos GMV (con cortos)} }
+\capbtabbox{
+\scalebox{0.9}{
+\begin{tabular}{ccc}
+  \toprule
+ & R. Mensual & R. Anualizado \\ 
+  \midrule
+E[Rp] & 1.0\% & 11.5\% \\ 
+  SD[Rp] & 1.8\% & 46.4\% \\ 
+  VaR 5$\%$ & \$-1,971.46 & \$-47,689.37 \\ 
+  VaR 1$\%$ & \$-3,160.65 & \$-61,859.89 \\ 
+  Sharpe & 51.0\% & 23.6\% \\ 
+   \bottomrule
+\end{tabular}
+}
+
+}{ \caption{GMV Retorno Mensual y Anualizado} }
+\end{floatrow} 
+\end{figure} 
+
+\subsection{Portafolio eficiente}
+
+\vspace{-10}
+\begin{figure}[!h]
+\CenterFloatBoxes   % alinea las cajas verticalmente
+\begin{floatrow}
+\ffigbox{
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/ef_sh} 
+
+\end{knitrout}
+}{\caption{Portafolio Eficiente retorno objetivo igual al activo con el retorno mas alto} }
+\capbtabbox{
+\scalebox{0.9}{
+\begin{tabular}{ccc}
+  \toprule
+ & R. Mensual & R. Anualizado \\ 
+  \midrule
+E[Rp] & 1.9\% & 23.0\% \\ 
+  SD[Rp] & 4.7\% & 75.2\% \\ 
+  VaR 5$\%$ & \$-5,675.52 & \$-63,487.73 \\ 
+  VaR 1$\%$ & \$-8,660.34 & \$-78,135.93 \\ 
+  Sharpe & 39.8\% & 29.9\% \\ 
+   \bottomrule
+\end{tabular}
+}
+
+}{ \caption{Portafolio eficiente Retorno Mensual y Anualizado} }
+\end{floatrow} 
+\end{figure} 
+
+\newpage
+\subsection{Portafolio de la Tangente con cortos}
+
+\vspace{-10}
+\begin{figure}[!h]
+\CenterFloatBoxes   % alinea las cajas verticalmente
+\begin{floatrow}
+\ffigbox{
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/t_port} 
+
+\end{knitrout}
+}{\caption{Portafolio de la Tangente} }
+\capbtabbox{
+\scalebox{0.9}{
+\begin{tabular}{ccc}
+  \toprule
+ & R. Mensual & R. Anualizado \\ 
+  \midrule
+E[Rp] & 1.1\% & 13.5\% \\ 
+  SD[Rp] & 2.0\% & 48.4\% \\ 
+  VaR 5$\%$ & \$-2,062.67 & \$-48,361.23 \\ 
+  VaR 1$\%$ & \$-3,356.61 & \$-62,868.12 \\ 
+  Sharpe & 55.6\% & 26.9\% \\ 
+   \bottomrule
+\end{tabular}
+}
+
+}{ \caption{Portafolio de la Tangente Retorno Mensual y Anualizado} }
+\end{floatrow} 
+\end{figure} 
+
+
+\subsection{Frontera Eficiente}
+\vspace{-20}
+
+\begin{figure}[!h]
+\begin{floatrow}
+\ffigbox{
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/Frontera_efi} 
+
+\end{knitrout}
+}{\caption{Portafolios Eficientes con un activo libre de Riesgo} }
+\end{floatrow}
+\end{figure}
+
+\newpage
+\subsection{Pesos de Portafolios Eficientes sin Activos libres de Riesgo(T-Bills)}
+\vspace{-20pt}
+\begin{figure}[h]
+
+
+{\centering \includegraphics[width=\maxwidth]{figure/Pesosp} 
+
+}
+
+\caption[Pesos Portafolios Eficientes]{Pesos Portafolios Eficientes\label{fig:Pesosp}}
+\end{figure}
+
+
+\vspace{-10pt}
+\subsection{Pesos de Portafolios Eficientes con Activos libres de Riesgo (T-Bills)}
+\vspace{-20pt}
+\begin{figure}[h]
+
+
+{\centering \includegraphics[width=\maxwidth]{figure/Pesos_T} 
+
+}
+
+\caption[Portafolios Eficientes T-bills y portafolio de la tangente]{Portafolios Eficientes T-bills y portafolio de la tangente\label{fig:Pesos.T}}
+\end{figure}
+
+
+
+hthththththhththththhtht
+thththhththththththt
+
+
+\newpage
+\subsection{Portafolio Global de la mínima varianza sin cortos}
+
+
+\begin{figure}[!h]
+\CenterFloatBoxes   % alinea las cajas verticalmente
+\begin{floatrow}
+\ffigbox{
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/gmv_nsh} 
+
+\end{knitrout}
+}{\caption{GMV sin cortos} }
+\capbtabbox{
+\scalebox{0.9}{
+\begin{tabular}{ccc}
+  \toprule
+ & R. Mensual & R. Anualizado \\ 
+  \midrule
+E[Rp] & 0.9\% & 10.6\% \\ 
+  SD[Rp] & 1.9\% & 47.4\% \\ 
+  VaR 5$\%$ & \$-2,169.18 & \$-48,995.83 \\ 
+  VaR 1$\%$ & \$-3,409.26 & \$-63,074.08 \\ 
+  sharpe & 45.1\% & 21.4\% \\ 
+   \bottomrule
+\end{tabular}
+}
+
+}{ \caption{GMV sin cortos Retorno Mensual y Anualizado} }
+\end{floatrow} 
+\end{figure}
+
+\subsection{Portafolio de la Tangente sin cortos}
+
+\vspace{-10}
+\begin{figure}[!h]
+\CenterFloatBoxes   % alinea las cajas verticalmente
+\begin{floatrow}
+\ffigbox{
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/tan_nsh} 
+
+\end{knitrout}
+}{\caption{Portafolio de la Tangente sin cortos} }
+\capbtabbox{
+\scalebox{0.9}{
+\begin{tabular}{ccc}
+  \toprule
+ & R. Mensual & R. Anualizado \\ 
+  \midrule
+E[Rp] & 1.0\% & 12.0\% \\ 
+  SD[Rp] & 2.0\% & 48.9\% \\ 
+  VaR 5$\%$ & \$-2,250.63 & \$-49,549.22 \\ 
+  VaR 1$\%$ & \$-3,568.60 & \$-63,845.21 \\ 
+  Sharpe & 48.1\% & 23.5\% \\ 
+   \bottomrule
+\end{tabular}
+}
+
+}{ \caption{Portafolio de la Tangente sin cortos Retorno Mensual y Anualizado} }
+\end{floatrow} 
+\end{figure} 
+
+\section{Asignación de Activos}
+\subsection{Portafolio Eficiente Retorno Objetivo 9$\%$ anual}
+
+\vspace{-15pt}
+\begin{figure}[!h]
+\CenterFloatBoxes   % alinea las cajas verticalmente
+\begin{floatrow}
+\ffigbox{
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/p_ef} 
+
+\end{knitrout}
+}{\caption{Portafolio Eficiente sin cortos con Retorno Objetivo del 9$\%$ anual} }
+\capbtabbox{
+\scalebox{0.9}{
+\begin{tabular}{ccc}
+  \toprule
+ & R. Mensual & R. Anualizado \\ 
+  \midrule
+E[Rp] & 0.007 & 0.090 \\ 
+  SD[Rp] & 0.020 & 0.494 \\ 
+  VaR 5$\%$ & -2560.384 & -51441.464 \\ 
+  VaR 1$\%$ & -3900.978 & -65319.515 \\ 
+  Sharpe & 0.348 & 0.172 \\ 
+   \bottomrule
+\end{tabular}
+}
+
+}{ \caption{Portafolio Eficiente sin cortos Retorno Mensual y Anualizado} }
+\end{floatrow} 
+\end{figure} 
+\vspace{-15pt}
+\subsection{Portafolio Eficiente Retorno Objetivo 9$\%$ anual (Combinación T-Bill y Portafolio de la Tangente sin cortos)}
+
+\vspace{-15pt}
+\begin{figure}[!h]
+\CenterFloatBoxes   % alinea las cajas verticalmente
+\begin{floatrow}
+\ffigbox{
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/pef_tbill09} 
+
+\end{knitrout}
+}{\caption{Portafolio Eficiente con Retorno Objetivo del 9$\%$ anual y activo libre de riesgo} }
+\capbtabbox{
+\scalebox{0.9}{
+\begin{tabular}{ccc}
+  \toprule
+ & R. Mensual & R. Anualizado \\ 
+  \midrule
+E[Rp] & 0.8\% & 9.0\% \\ 
+  SD[Rp] & 1.5\% & 42.0\% \\ 
+  VaR 5$\%$ & \$-1,657.57 & \$-45,192.45 \\ 
+  VaR 1$\%$ & \$-2,639.27 & \$-58,843.10 \\ 
+  Sharpe & 48.1\% & 20.2\% \\ 
+   \bottomrule
+\end{tabular}
+}
+
+}{ \caption{Portafolio Eficiente con T-Bill Retorno Mensual y Anualizado} }
+\end{floatrow} 
+\end{figure} 
+
+
+\section{Risk Budgeting - Portafolio Eficiente(E[Rp]=9$\%$)}
+
+
+\begin{kframe}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error: el argumento 8 concuerda con multiples argumentos formales}}\end{kframe}
+
+
+
+
+
+\newpage
+\section{Apéndice}
+\textbf{Apéndice I }
+\begin{table}[ht]
+\centering
+\scalebox{0.58}{
+\begin{tabular}{rlrrrrrr}
+  \hline
+ & date & vbltx & adbe & orcl & veurx & veiex & vfinx \\ 
+  \hline
+1 & feb 2009 & -0.017 & -0.145 & -0.080 & -0.112 & -0.062 & -0.113 \\ 
+  2 & mar 2009 & 0.018 & 0.248 & 0.151 & 0.076 & 0.149 & 0.084 \\ 
+  3 & abr 2009 & -0.012 & 0.246 & 0.070 & 0.124 & 0.149 & 0.091 \\ 
+  4 & may 2009 & 0.013 & 0.030 & 0.013 & 0.132 & 0.167 & 0.055 \\ 
+  5 & jun 2009 & 0.028 & 0.004 & 0.089 & -0.022 & -0.023 & 0.002 \\ 
+  6 & jul 2009 & 0.035 & 0.136 & 0.035 & 0.102 & 0.110 & 0.073 \\ 
+  7 & ago 2009 & 0.021 & -0.031 & -0.011 & 0.053 & -0.007 & 0.035 \\ 
+  8 & sep 2009 & 0.026 & 0.050 & -0.049 & 0.050 & 0.089 & 0.037 \\ 
+  9 & oct 2009 & -0.009 & -0.003 & 0.014 & -0.021 & -0.014 & -0.019 \\ 
+  10 & nov 2009 & 0.015 & 0.063 & 0.046 & 0.039 & 0.058 & 0.058 \\ 
+  11 & dic 2009 & -0.035 & 0.047 & 0.105 & 0.005 & 0.036 & 0.019 \\ 
+  12 & ene 2010 & 0.023 & -0.130 & -0.060 & -0.065 & -0.065 & -0.037 \\ 
+  13 & feb 2010 & -0.003 & 0.070 & 0.067 & -0.011 & 0.011 & 0.030 \\ 
+  14 & mar 2010 & -0.004 & 0.021 & 0.042 & 0.062 & 0.078 & 0.058 \\ 
+  15 & abr 2010 & 0.028 & -0.051 & 0.008 & -0.029 & 0.002 & 0.016 \\ 
+  16 & may 2010 & 0.015 & -0.046 & -0.137 & -0.131 & -0.098 & -0.083 \\ 
+  17 & jun 2010 & 0.040 & -0.194 & -0.050 & -0.011 & -0.000 & -0.054 \\ 
+  18 & jul 2010 & 0.010 & 0.083 & 0.099 & 0.122 & 0.089 & 0.068 \\ 
+  19 & ago 2010 & 0.055 & -0.036 & -0.079 & -0.044 & -0.023 & -0.046 \\ 
+  20 & sep 2010 & -0.011 & -0.058 & 0.206 & 0.108 & 0.106 & 0.085 \\ 
+  21 & oct 2010 & -0.023 & 0.074 & 0.092 & 0.046 & 0.029 & 0.037 \\ 
+  22 & nov 2010 & -0.014 & -0.013 & -0.083 & -0.084 & -0.028 & 0.000 \\ 
+  23 & dic 2010 & -0.020 & 0.102 & 0.146 & 0.086 & 0.071 & 0.065 \\ 
+  24 & ene 2011 & -0.017 & 0.071 & 0.025 & 0.034 & -0.028 & 0.023 \\ 
+  25 & feb 2011 & 0.015 & 0.043 & 0.027 & 0.033 & -0.008 & 0.034 \\ 
+  26 & mar 2011 & -0.002 & -0.040 & 0.016 & -0.009 & 0.054 & 0.000 \\ 
+  27 & abr 2011 & 0.025 & 0.012 & 0.075 & 0.079 & 0.034 & 0.029 \\ 
+  28 & may 2011 & 0.029 & 0.032 & -0.050 & -0.031 & -0.029 & -0.012 \\ 
+  29 & jun 2011 & -0.020 & -0.096 & -0.039 & -0.021 & -0.015 & -0.017 \\ 
+  30 & jul 2011 & 0.042 & -0.127 & -0.072 & -0.038 & -0.008 & -0.021 \\ 
+  31 & ago 2011 & 0.042 & -0.093 & -0.086 & -0.106 & -0.090 & -0.056 \\ 
+  32 & sep 2011 & 0.064 & -0.043 & 0.023 & -0.122 & -0.176 & -0.073 \\ 
+  33 & oct 2011 & -0.002 & 0.196 & 0.133 & 0.112 & 0.127 & 0.104 \\ 
+  34 & nov 2011 & -0.009 & -0.070 & -0.044 & -0.034 & -0.035 & -0.002 \\ 
+  35 & dic 2011 & 0.033 & 0.031 & -0.201 & -0.021 & -0.033 & 0.010 \\ 
+  36 & ene 2012 & 0.012 & 0.091 & 0.098 & 0.052 & 0.106 & 0.044 \\ 
+  37 & feb 2012 & -0.006 & 0.061 & 0.036 & 0.055 & 0.054 & 0.042 \\ 
+  38 & mar 2012 & -0.029 & 0.042 & -0.003 & 0.002 & -0.029 & 0.032 \\ 
+  39 & abr 2012 & 0.032 & -0.022 & 0.010 & -0.024 & -0.018 & -0.006 \\ 
+  40 & may 2012 & 0.046 & -0.077 & -0.105 & -0.127 & -0.117 & -0.062 \\ 
+  41 & jun 2012 & -0.005 & 0.042 & 0.115 & 0.074 & 0.047 & 0.040 \\ 
+  42 & jul 2012 & 0.045 & -0.047 & 0.019 & 0.007 & 0.006 & 0.014 \\ 
+  43 & ago 2012 & -0.006 & 0.013 & 0.047 & 0.044 & 0.005 & 0.022 \\ 
+  44 & sep 2012 & -0.008 & 0.037 & -0.006 & 0.032 & 0.052 & 0.025 \\ 
+  45 & oct 2012 & 0.010 & 0.048 & -0.010 & 0.016 & -0.004 & -0.019 \\ 
+  46 & nov 2012 & 0.002 & 0.017 & 0.035 & 0.024 & 0.013 & 0.006 \\ 
+  47 & dic 2012 & -0.010 & 0.085 & 0.040 & 0.035 & 0.057 & 0.009 \\ 
+  48 & ene 2013 & -0.024 & 0.004 & 0.064 & 0.049 & 0.006 & 0.050 \\ 
+  49 & feb 2013 & 0.009 & 0.038 & -0.036 & -0.032 & -0.017 & 0.013 \\ 
+  50 & mar 2013 & -0.001 & 0.102 & -0.057 & 0.003 & -0.016 & 0.037 \\ 
+  51 & abr 2013 & 0.036 & 0.035 & 0.014 & 0.042 & 0.014 & 0.019 \\ 
+  52 & may 2013 & -0.053 & -0.049 & 0.030 & 0.000 & -0.038 & 0.023 \\ 
+  53 & jun 2013 & -0.048 & 0.060 & -0.095 & -0.044 & -0.063 & -0.014 \\ 
+  54 & jul 2013 & -0.002 & 0.037 & 0.056 & 0.071 & 0.010 & 0.050 \\ 
+  55 & ago 2013 & -0.015 & -0.033 & -0.015 & -0.013 & -0.032 & -0.030 \\ 
+  56 & sep 2013 & 0.007 & 0.127 & 0.040 & 0.067 & 0.069 & 0.031 \\ 
+  57 & oct 2013 & 0.020 & 0.043 & 0.014 & 0.040 & 0.045 & 0.045 \\ 
+  58 & nov 2013 & -0.016 & 0.046 & 0.052 & 0.011 & -0.021 & 0.030 \\ 
+  59 & dic 2013 & -0.009 & 0.053 & 0.081 & 0.026 & -0.009 & 0.025 \\ 
+   \hline
+\end{tabular}
+}
+\caption{Retornos Mensuales 2009-2013} 
+\label{tabrescaled}
+\end{table}
+
+\newpage
+
+\end{document}

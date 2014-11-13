@@ -1,0 +1,1277 @@
+\documentclass[11pt,spanish]{article}
+
+\usepackage[spanish]{babel} %config en español
+
+\usepackage[T1]{fontenc}  %acentos en español
+\usepackage{selinput}
+\SelectInputMappings{
+  aacute={á},
+  ntilde={ñ}
+}
+
+\usepackage[margin=2.54cm,        % margenes
+            letterpaper]{geometry}  
+
+
+\usepackage{hyperref} % para generar una tabla de contenido con hipervinculos
+\hypersetup{
+    colorlinks,
+    citecolor=black,   % establece los colores de los links
+    filecolor=black,
+    linkcolor=black,   % remueve las cajas rojas
+    urlcolor=black
+}
+
+
+\usepackage{titlesec}    % se centran todas las secciones
+\titleformat*{\section}{\centering\normalfont\large\bfseries}
+
+\usepackage{setspace}
+%\doublespacing        % doble espaciado
+ \linespread{1.3}      % uno y medio espaciado (alternativo)
+% \linespread{1.6}     % doble espaciado (alternativo)
+
+\raggedright  % justificar a la izquierda
+
+%\usepackage{parskip}
+%\setlength{\parindent}{0pt} % no funciona eliminar indentacion
+
+\usepackage{mathptmx}  % fuente Times New Roman
+
+\newlength{\QuarterPage}          % define el espaciado del titulo
+\setlength{\QuarterPage}{2.5in}
+\newlength{\Twolines}
+\setlength{\Twolines}{0.8in}      % define el espaciado del titulo
+
+\usepackage{mathtools}           % herramientas para ecuaciones
+
+% \pagestyle{plain}
+%  \pagestyle{headings}
+
+%\usepackage{caption}
+%\captionsetup{labelfont=bf}
+
+%\captionsetup[figure]{font=small,skip=0pt}     % Ajusta el espaciado del caption
+%\captionsetup[table]{font=small} % Ajusta solo la letra del caption
+
+
+
+\newcommand{\squeezeup}{\vspace{-30mm}}   % reducir el espacio antes/despues figuras
+
+\usepackage{newverbs}      % generar letra tipo verbatim
+
+\usepackage{xcolor}
+\newverbcommand{\bverb}
+  {\begin{lrbox}{\verbbox}}
+  {\end{lrbox}\colorbox{gray!7}{\box\verbbox}}  % genera texto verbatim con fondo gris
+
+\usepackage{longtable} % tablas largas
+
+\usepackage{subfig}   % subfiguras (afecta el espaciado de los captions de las figuras y tablas)
+%\usepackage{subcaption} % alternativo subfiguras
+
+\usepackage{booktabs}   % opciones para tablas xtable y hmisc(latex)
+
+\usepackage{floatrow}
+\newfloatcommand{capbtabbox}{table}[][\FBwidth] % caption tamaño de la figura/tabla
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Documento Principal
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\begin{titlepage}
+\begin{center}
+\vspace*{\QuarterPage}
+{\large Portafolio } \\
+\end{center}
+\end{titlepage}
+
+\thispagestyle{empty}  % elimino el numero de la pagina
+
+%--------------------------------------------------------------------------------------
+%  Tabla de contenido
+%-------------------------------------------------------------------------------------
+
+
+\newpage
+\tableofcontents
+\thispagestyle{empty}
+
+%--------------------------------------------------------------------------------------
+%  Secciones del trabajo
+%-------------------------------------------------------------------------------------
+
+\newpage
+\setcounter{page}{1} % incializa el conteo de las paginas
+\section{Resumen ejecutivo}
+\label{Resumen}
+
+\newpage
+\section{Calculo de Rendimientos y Estadística Descriptiva}
+\label{EstaDescrip}
+\subsection{Tendencias de Tiempo de los Precios y Retornos de los Activos}
+
+<<import, echo=F,eval=TRUE,tidy=TRUE, tidy.opts=list(width=60), message=FALSE,results='hide'>>=
+library(tseries)
+library(PerformanceAnalytics)
+library(ggplot2)
+library(reshape2)
+library(plyr)
+library(dplyr)
+library(scales)
+library(lattice)
+library(Hmisc)
+library(xtable)
+source("C:/users/usuario/Desktop/portfolio.r.txt")
+source("C:/users/usuario/Desktop/portfolio_noshorts.r.txt")
+
+vbltx.z <- get.hist.quote(instrument="vbltx",start="2009-01-01",end="2013-12-31",quote="AdjClose",provider="yahoo",origin="1970-01-01",compression="m",retclass="zoo")
+adbe.z <- get.hist.quote(instrument="adbe",start="2009-01-01",end="2013-12-31",quote="AdjClose",provider="yahoo",origin="1970-01-01",compression="m",retclass="zoo")
+orcl.z <- get.hist.quote(instrument="orcl",start="2009-01-01",end="2013-12-31",quote="AdjClose",provider="yahoo",origin="1970-01-01",compression="m",retclass="zoo")
+vfinx.z <- get.hist.quote(instrument="vfinx",start="2009-01-01",end="2013-12-31",quote="AdjClose",provider="yahoo",origin="1970-01-01",compression="m",retclass="zoo")
+veurx.z <- get.hist.quote(instrument="veurx",start="2009-01-01",end="2013-12-31",quote="AdjClose",provider="yahoo",origin="1970-01-01",compression="m",retclass="zoo")
+veiex.z <- get.hist.quote(instrument="veiex",start="2009-01-01",end="2013-12-31",quote="AdjClose",provider="yahoo",origin="1970-01-01",compression="m",retclass="zoo")
+index(vbltx.z) <- as.yearmon(index(vbltx.z))
+index(adbe.z) <- as.yearmon(index(adbe.z))
+index(orcl.z) <- as.yearmon(index(orcl.z))
+index(vfinx.z) <- as.yearmon(index(vfinx.z))
+index(veurx.z) <- as.yearmon(index(veurx.z))
+index(veiex.z) <- as.yearmon(index(veiex.z))
+asset.p <- merge(vbltx.z,adbe.z,orcl.z,veurx.z,veiex.z,vfinx.z)  # objeto zoo
+asset.r <- diff(log(asset.p))        # objeto zoo
+asset.names <- c("vbltx","adbe","orcl","veurx","veiex","vfinx")
+colnames(asset.r) <- asset.names
+colnames(asset.p) <- c("vbltx","adbe","orcl","veurx","veiex","vfinx")
+assetr.mz <- coredata(asset.r)  			# se convierte en matriz
+assetr.df <- data.frame(date=index(asset.r),coredata(asset.r),stringsAsFactors=FALSE)
+assetr.df$date <- as.Date(assetr.df$date)    # se convierte yearmon - Date
+assetr.melt <- melt(assetr.df,id="date",variable.name="activos",value.name="retornos")
+rf <- 0.005 # anual
+rf.m <- rf/12 # mensual
+sigma.mat <- var(asset.r)
+@
+
+<<precios,echo=F,results='asis', out.width="8.1cm", out.height="8cm",fig.align='center',fig.cap="Precios y Retornos Mensuales",fig.show='hold',fig.pos="h",tidy=TRUE,tidy.opts=list(width=60),dpi=120,cache=TRUE>>=
+xyplot(asset.p,type = c("l","g"),main = "Precios Activos",
+  lwd=1,col="navy",scales=list(y=list(cex=0.6),x=list(cex=0.8)),
+	par.strip.text = list(cex = 1,col="white"),
+	strip = strip.custom(factor.levels = paste(colnames(asset.p),"precios")),
+	par.settings = list(strip.background = list(col="navy")))
+# rendimientos
+xyplot(asset.r,type = c("l","g"),main = "Rendimientos Activos",
+  par.strip.text = list(cex = 1,col="white"),
+	strip=F, strip.left = strip.custom(factor.levels = colnames(asset.r)),
+	par.settings = list(strip.background = list(col="navy")),
+        panel = function(x,y,...) {
+         panel.xyplot(x,y,lwd=1,col="navy",...)
+         panel.abline(h=0,lwd=0.7,col="orange",...)},
+	scales=list(y=list(cex=0.6),x=list(cex=0.8)))
+
+@
+Los fondos mutuos que replican indices de diferentes países como el indice del S\&P 500
+(vfinx), el indice Europeo de acciones (veurx) y el índice de países emergentes (veiex)
+parecen moverse en la misma dirección. Por ejemplo estos indices cayeron aproximadamente en el tercer trimestre del 2011. En cuanto al índice de bonos a largo plazo(vbltx) parece tener una tendencia alcista hasta el 2012 y  a partir de este año tiene tendencia horizontal y bajista. A partir del cuarto trimestre la acción de Adobe parece presentar una tendencia alcista mayor que la de la acción de Oracle. 
+
+En cuanto a los rendimientos continuos de los tres fondos estos presentan una fluctuación alrededor de su media hasta la mitad del año 2011 después se observa que caen los rendimientos dramáticamente a partir del segundo trimestre del 2011,  para volver a recuperarse a finales del año 2011, vuelven a acaer aproximadamente a partir del segundo trimestre del 2012 y fluctuan alrededor de su media hasta finales del 2013. El índice de bonos a largo plazo ha fluctuado alrededor de su media pero a mediados del 2013 cayó considerablemente. El rendimiento de la acción de Oracle tuvo su pico a finales del 2010 pero presentó una fuerte caida a finales del 2011, principios del 2012.
+
+\newpage
+\subsection{Retornos Acumulados (Equity Curve)}
+\textbf{Crecimiento de \$1 a través del tiempo}
+<<Crecimiento,echo=F,results='asis', fig.height=4.5,fig.width=8,fig.align='center',fig.cap="Retornos Acumulados",fig.pos="h",tidy=TRUE,tidy.opts=list(width=60),cache=TRUE>>=
+chart.CumReturns(asset.r, lwd=1, legend.loc="topleft", main="Crecimiento de $1",ylab="Valor",xlab="Fecha")
+@
+Se observa en la gráfica que un dólar invertido al comienzo del 2009 genera mayor retorno en la inversión en Adobe Inc. que en cualquier otro activo, de hecho ha generado aproximadamente un 150\% de retorno acumulado hasta finales del 2013. El índice (vfinx) también ha generado un retorno acumulado bastante alto de aproximadamente 130\%. Por otro lado el activo que ha generado el peor retorno acumulado ha sido el índice de bonos a largo plazo (vbltx) el cual generó un retorno acumulado aproximado de  40\%.
+\vspace*{10pt}
+
+<<cum.r,echo=FALSE,results='asis',cache=TRUE>>=
+cum.r <- Return.cumulative(asset.r,geometric=TRUE)
+cum.t <- xtable(cum.r,caption="Retornos Acumulados",digits=3)
+print(cum.t,comment = FALSE,include.rownames =TRUE)
+@
+
+\newpage
+\subsection{Normalidad de Retornos Continuos}
+
+
+<<Diagnosticos,echo=F,results='asis', out.width="3.8cm", out.height="2.8cm",fig.align='center',fig.cap="Diagnosticos Estadísticos",fig.show='hold',fig.pos="h",tidy=TRUE,tidy.opts=list(width=60),include=FALSE,cache=TRUE>>=
+hist(assetr.mz[,1],main="rendimientos mensuales continuos",xlab="Vbltx", probability=T, col="navy",border="white")
+rug(jitter(assetr.mz[,1]))
+boxplot(assetr.mz[,1],outchar=T, main="Boxplot", col="navy")
+abline(h=median(assetr.mz[,1]),lwd=3,lty=1,col="white")
+plot(density(assetr.mz[,1]),type="l", main="Densidad suavizada",xlab="rendimiento mensual", ylab="estimado de densidad", col="navy")
+qqnorm(assetr.mz[,1], col="navy")
+qqline(assetr.mz[,1])
+
+hist(assetr.mz[,2],main="rendimientos mensuales continuos",xlab="Adbe", probability=T, col="navy",border="white")
+rug(jitter(assetr.mz[,2]))
+boxplot(assetr.mz[,2],outchar=T, main="Boxplot", col="navy")
+abline(h=median(assetr.mz[,2]),lwd=3,lty=1,col="white")
+plot(density(assetr.mz[,2]),type="l", main="Densidad suavizada",xlab="rendimiento mensual", ylab="estimado de densidad", col="navy")
+qqnorm(assetr.mz[,2], col="navy")
+qqline(assetr.mz[,2])
+
+hist(assetr.mz[,3],main="rendimientos mensuales continuos",xlab="orcl", probability=T, col="navy",border="white")
+rug(jitter(assetr.mz[,3]))
+boxplot(assetr.mz[,3],outchar=T, main="Boxplot", col="navy")
+abline(h=median(assetr.mz[,3]),lwd=3,lty=1,col="white")
+plot(density(assetr.mz[,3]),type="l", main="Densidad suavizada",xlab="rendimiento mensual", ylab="estimado de densidad", col="navy")
+qqnorm(assetr.mz[,3], col="navy")
+qqline(assetr.mz[,3])
+
+hist(assetr.mz[,4],main="rendimientos mensuales continuos",xlab="veurx", probability=T, col="navy",border="white")
+rug(jitter(assetr.mz[,4]))
+boxplot(assetr.mz[,3],outchar=T, main="Boxplot", col="navy")
+abline(h=median(assetr.mz[,4]),lwd=3,lty=1,col="white")
+plot(density(assetr.mz[,4]),type="l", main="Densidad suavizada",xlab="rendimiento mensual", ylab="estimado de densidad", col="navy")
+qqnorm(assetr.mz[,4], col="navy")
+qqline(assetr.mz[,4])
+
+hist(assetr.mz[,5],main="rendimientos mensuales continuos",xlab="veiex", probability=T, col="navy",border="white")
+rug(jitter(assetr.mz[,5]))
+boxplot(assetr.mz[,3],outchar=T, main="Boxplot", col="navy")
+abline(h=median(assetr.mz[,5]),lwd=3,lty=1,col="white")
+plot(density(assetr.mz[,5]),type="l", main="Densidad suavizada",xlab="rendimiento mensual", ylab="estimado de densidad", col="navy")
+qqnorm(assetr.mz[,5], col="navy")
+qqline(assetr.mz[,5])
+
+hist(assetr.mz[,6],main="rendimientos mensuales continuos",xlab="vfinx", probability=T, col="navy",border="white")
+rug(jitter(assetr.mz[,6]))
+boxplot(assetr.mz[,6],outchar=T, main="Boxplot", col="navy")
+abline(h=median(assetr.mz[,6]),lwd=3,lty=1,col="white")
+plot(density(assetr.mz[,6]),type="l", main="Densidad suavizada",xlab="rendimiento mensual", ylab="estimado de densidad", col="navy")
+qqnorm(assetr.mz[,6], col="navy")
+qqline(assetr.mz[,6])
+@
+
+\begin{figure}[!hbt]
+\captionsetup[subfloat]{farskip=2pt,nearskip=-3pt}
+\centering
+\subfloat[Vbltx\label{fig:Diagnosticos1}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos1.pdf}}}
+\subfloat[Vbltx\label{fig:Diagnosticos2}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos2.pdf}}}
+\subfloat[Vbltx\label{fig:Diagnosticos3}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos3.pdf}}}
+\subfloat[Vbltx\label{fig:Diagnosticos4}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos4.pdf}}}
+
+
+\subfloat[Adbe\label{fig:Diagnosticos5}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos5.pdf}}}
+\subfloat[Adbe\label{fig:Diagnosticos6}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos6.pdf}}}
+\subfloat[Adbe\label{fig:Diagnosticos7}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos7.pdf}}}
+\subfloat[Adbe\label{fig:Diagnosticos8}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos8.pdf}}}
+
+\subfloat[orcl\label{fig:Diagnosticos9}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos9.pdf}}}
+\subfloat[orcl\label{fig:Diagnosticos10}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos10.pdf}}}
+\subfloat[orcl\label{fig:Diagnosticos11}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos11.pdf}}}
+\subfloat[orcl\label{fig:Diagnosticos12}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos12.pdf}}}
+
+\subfloat[veurx\label{fig:Diagnosticos13}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos13.pdf}}}
+\subfloat[veurx\label{fig:Diagnosticos14}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos14.pdf}}}
+\subfloat[veurx\label{fig:Diagnosticos15}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos15.pdf}}}
+\subfloat[veurx\label{fig:Diagnosticos16}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos16.pdf}}}
+
+\subfloat[veiex\label{fig:Diagnosticos17}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos17.pdf}}}
+\subfloat[veiex\label{fig:Diagnosticos18}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos18.pdf}}}
+\subfloat[veiex\label{fig:Diagnosticos19}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos19.pdf}}}
+\subfloat[veiex\label{fig:Diagnosticos20}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos20.pdf}}}
+
+\subfloat[vfinx\label{fig:Diagnosticos21}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos21.pdf}}}
+\subfloat[vfinx\label{fig:Diagnosticos22}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos22.pdf}}}
+\subfloat[vfinx\label{fig:Diagnosticos23}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos23.pdf}}}
+\subfloat[vfinx\label{fig:Diagnosticos24}]{{\centering \includegraphics[width=.21\textwidth,height=.16\textwidth]{figure/Diagnosticos24.pdf}}}
+\vspace*{10pt}
+\caption[Diagnosticos Estadísticos]{Diagnosticos Estadísticos\label{fig:Diagnosticos}}
+\end{figure}
+Los gráficos de diagnósticos contienen histogramas, gráficos de densidad suavizados, Diagrama de cajas y gráficos QQ , son utilizados para determinar si los retornos están normalmente distribuidos.
+
+\newpage
+\subsection{Estadística Descriptiva}
+<<estadisticos,echo=FALSE,results='asis',message=FALSE>>=
+
+estadis.df <- assetr.melt %.% group_by(activos) %.% summarise( 
+            mean=mean(retornos),variance=var(retornos),sd=sd(retornos),
+            skewness=skewness(retornos),kurtosis=kurtosis(retornos),
+            q1=quantile(retornos,0.01),q5=quantile(retornos,0.05))
+estadis.df<- as.data.frame(estadis.df)
+estadis.df$mean <- percent(as.numeric(as.character(estadis.df$mean)))
+estadis.df$sd <- percent(as.numeric(as.character(estadis.df$sd)))
+estadis.df <- estadis.df[,-1]
+rownames(estadis.df) <- c("Fondo Bonos a largo plazo:vbltx","Adobe Inc:adbe","Oracle Corp:orcl","Indice Europeo Vanguard:veurx","Mercados Emergentes Vanguard:veiex","Indice SP500 Vanguard:vfinx")
+colnames(estadis.df) <- c("$\\hat{\\mu}$","$\\hat{\\sigma}^2$","$\\hat{\\sigma}$","Skew","E. Kurtosis"," Cuantil $1\\%$","Cuantil $5\\%$")
+estadis.t <- xtable(estadis.df,caption="Estadísticos Retornos Mensuales",label="tabrescaled",digits=3)
+print(estadis.t,comment = FALSE,include.rownames =TRUE,scalebox=0.8,sanitize.colnames.function = function(x){x})
+@
+Estos Son los estimados de los parametros del modelo de retorno constante(CER). Se observa que los indices veurx ,vfinx y la acción de Oracle corp.(orcl) presentan sesgo negativo , mientras que los otros activos presentan sesgo positivo. En cuanto a las densidades la acción de oracle parece tener una distibución normal apoyada por el grafico QQ. Los retornos de veurx no estan tan normalmente distribuidos.
+
+<<rr,echo=FALSE, include=FALSE,cache=TRUE,message=FALSE>>=
+mu.vec = apply(assetr.mz,2,mean)
+sd.vec = apply(assetr.mz,2,sd)
+plot(sd.vec, mu.vec,  ylim=c(0, 0.03), xlim=c(0, 0.10), ylab=expression(mu[p]),
+     xlab=expression(sigma[p]), pch=19, col=1:6, cex=1, cex.lab=1,cex.axis=0.6)     
+text(sd.vec[-4], mu.vec[-4], labels=asset.names[-4], pos=4, cex = 1)
+text(sd.vec[4], mu.vec[4], labels="veurx", pos=2, cex = 1)
+@
+\vspace*{10pt}
+<<riesgo.retorno,echo=FALSE, results='asis',message=FALSE,cache=TRUE>>=
+riesgo.r <- t(data.frame(mu.vec/sd.vec))
+rownames(riesgo.r) <- "Riesgo/Retorno"
+riesgor.t <- xtable(riesgo.r,caption="Riesgo/Retorno ratios",digits=3,label="tabrescaled")
+print(riesgor.t ,comment = FALSE,include.rownames =TRUE,scalebox=0.9)
+@
+
+Se observa que el activo con mejor ratio riesgo/retorno es el fondo de S\&P500 (vfinx) y el de peor es la acción de Oracle corp.(orcl)
+\vspace*{-15pt}
+<<graficor.r,echo=FALSE,results='asis',fig.height=3.5,fig.width=6,fig.cap="Riesgo-Retorno Tradeoff ", fig.pos="h",cache=TRUE>>=
+<<rr>>
+@
+
+\newpage\subsection{Pendiente Sharpe}
+<<Sharpe, echo=FALSE, results='asis', cache=TRUE>>=
+rf <- 0.005  # mensual equivalente a 0.5% anual
+sharpe.r <- t(data.frame((mu.vec-(rf/12))/sd.vec))
+rownames(sharpe.r) <- "Sharpe Ratio"
+sharper.t <- xtable(sharpe.r,caption="Sharpe Ratio por Activo",digits=3,label="tabrescaled")
+print(sharper.t ,comment = FALSE,include.rownames =TRUE,scalebox=0.9)
+@
+La pendiente Sharpe es el excedente del retorno esperado por unidad de riesgo, en otras palabras es la prima de riesgo en el activo por unidad de riesgo. Para el calculo de la pendiente se ha utilizado un activo libre de riesgo (rf)= \Sexpr{rf/12}.El activo con la mayor pendiente es el fondo de S\&P 500 (vfinx), quiere decir esto que un inversionista preferira un activo con un Sharpe Ratio alto a uno con un ratio bajo.
+
+\subsection{Errores Estandar}
+
+<<Errores.Estandar,echo=FALSE,results='asis', warning=FALSE,cache=TRUE>>=
+muhat.vals <- apply(assetr.mz,2,mean)
+sigma2hat.vals <- apply(assetr.mz,2,var)
+sigmahat.vals <- apply(assetr.mz,2,sd)
+cov.mat = var(asset.r)
+cor.mat = cor(asset.r)
+covhat.vals = cov.mat[lower.tri(cov.mat)]
+rhohat.vals = cor.mat[lower.tri(cor.mat)]
+names(covhat.vals) <- names(rhohat.vals) <- c("adbe,vbltx","orcl,vbltx","veurx,vbltx","veiex,vbltx","vfinx,vbltx","orcl,adbe","veurx,adbe","veiex,adbe","vfinx,adbe","veurx,orcl","veiex,orcl","vfinx,orcl","veiex,veurx","vfinx,veurx","vfinx,veiex")
+nobs <- nrow(assetr.mz)
+se.muhat = sigmahat.vals/sqrt(nobs)
+se.sigma2hat = sigma2hat.vals/sqrt(nobs/2)
+se.sigmahat = sigmahat.vals/sqrt(2*nobs)
+se.rhohat = (1-rhohat.vals^2)/sqrt(nobs)
+se.df <- cbind(muhat.vals,se.muhat,sigma2hat.vals,se.sigma2hat,sigmahat.vals,se.sigmahat)
+colnames(se.df) <- c("$\\hat{\\mu}$","$SE_{\\hat{\\mu}}$","$\\hat{\\sigma}^2$","$SE_{\\hat{\\sigma}^2}$","$\\hat{\\sigma}$","$SE_{\\hat{\\sigma}}$")
+se.rho <- cbind(rhohat.vals,se.rhohat)
+colnames(se.rho) <- c("$\\hat{\\rho}$","$SE_{\\hat{\\rho}}$")
+se.t <- xtable(se.df,caption="Errores Estandar de Estimados",label="Errores.E",digits=4)
+align(se.t) <- rep("c",7)
+print(se.t,comment = FALSE,include.rownames =TRUE,scalebox=0.9,sanitize.text.function = function(x){x})
+@
+
+Como se puede observar en el Cuadro \ref{Errores.E} los valores estimados de ($\displaystyle\hat{\mu}$) presentan errores estándar muy grandes comparados con los valores estimados de ($\displaystyle\hat{\sigma}$). Es útil comparar la magnitud del error estándar (SE) con el valor del estimado para evaluar que tan preciso es el estimado. Como se observa en el Cuadro \ref{Precision.se} los estimados de los retornos esperados ($\displaystyle\hat{\mu}$) son aproximadamente de 1.4 a 2.68 veces sus respectivos errores 
+
+<<se.rho,echo=FALSE,results='asis',cache=TRUE>>=
+serho.t <- xtable(se.rho,caption="Errores Estandar de Coeficientes de Correlación",label="tabrescaled",digits=4)
+align(serho.t) <- rep("c",3)
+print(serho.t,comment = FALSE,include.rownames =TRUE,scalebox=0.9,sanitize.text.function = function(x){x})
+@
+
+\newpage
+estándar, en cambio si se observan los estimados de las desviaciones estándar ($\displaystyle\hat{\sigma}$) son aproximadamente 10.8 veces sus respectivos errores estándar. La evidencia anterior destaca la mayor precisión que presentan los estimados de las desviaciones estándar ($\displaystyle\hat{\sigma}$) que los estimados de los retornos esperados ($\displaystyle\hat{\mu}$).
+
+<<Precision.se,echo=FALSE, results='asis',cache=TRUE>>=
+precision.df <- data.frame(muhat.vals/se.muhat,sigmahat.vals/se.sigmahat)
+colnames(precision.df) <- c("$\\hat{\\mu}/SE_{\\hat{\\mu}}$","$\\hat{\\sigma}/SE_{\\hat{\\sigma}}$")
+precision.t <- xtable(precision.df,caption="Precisión de los Errores Estandar",label="Precision.se",digits=3)
+align(precision.t) <- rep("c",3)
+print(precision.t,comment = FALSE,include.rownames =TRUE,scalebox=0.9,sanitize.text.function = function(x){x})
+@
+
+\subsection{Intervalos de Confianza (95\%) de los estimados de las desviaciones estándar ($\displaystyle\hat{\sigma}$) y de las medias ($\displaystyle\hat{\mu}$)}
+
+<<IC, echo=FALSE,results='asis',cache=TRUE>>=
+mu.lower = muhat.vals - 2*se.muhat
+mu.upper = muhat.vals + 2*se.muhat
+mu.width = mu.upper - mu.lower
+sigma.lower = sigmahat.vals - 2*se.sigmahat
+sigma.upper = sigmahat.vals + 2*se.sigmahat
+sigma.width = sigma.upper - sigma.lower
+mu.sigma.ic <- cbind(mu.lower,mu.upper,mu.width,sigma.lower,sigma.upper,sigma.width)
+colnames(mu.sigma.ic) <- c("$\\mu$ Inferior","$\\mu$ Superior","$\\mu$ Ancho", "$\\sigma$ Inferior","$\\sigma$ Superior","$\\sigma$ Ancho")
+ic.t <-  xtable(mu.sigma.ic ,caption="Intervalos de Confianza de $\\mu$ y $\\displaystyle \\sigma$ ",label="IC",digits=4)
+align(ic.t) <-  "cccc|ccc"
+print(ic.t,comment = FALSE,include.rownames =TRUE,scalebox=0.9,sanitize.text.function = function(x){x})
+@
+\begin{itemize}
+  \item  Los Intervalos de confianza (95\%) de la media son muy anchos $\Rightarrow$ Estimado impreciso.
+  \item  El ancho de los intervalos es grande con respecto al tamaño del estimado de la media de los activos
+  \item  Los Intervalos de confianza (95\%) de la desviación estándar son angostos $\Rightarrow$ Estimado preciso.
+  \item  El ancho de los intervalos es pequeño con respecto al tamaño del estimado de las desviaciones estándar de los activos. 
+\end{itemize}
+
+   
+\newpage\subsection{Bootstrap - Remuestreo}
+\textbf{Bootstrap Media}    
+
+<<bootstrap,echo=FALSE,results='asis',message=FALSE, cache=TRUE>>=
+library(boot)
+mean.boot = function(x, idx) {     # funcion para el bootstrap de la media
+  ans = mean(x[idx])
+  ans
+}
+vbltx.mean.boot = boot(assetr.mz[,1], statistic = mean.boot, R=999)
+adbe.mean.boot = boot(assetr.mz[,2], statistic = mean.boot, R=999)
+orcl.mean.boot = boot(assetr.mz[,3], statistic = mean.boot, R=999)
+veurx.mean.boot = boot(assetr.mz[,4], statistic = mean.boot, R=999)
+veiex.mean.boot = boot(assetr.mz[,5], statistic = mean.boot, R=999)
+vfinx.mean.boot = boot(assetr.mz[,6], statistic = mean.boot, R=999)
+mu.vbltx <- vbltx.mean.boot$t0  # estimado original
+mu.boot.vbltx <- mean(vbltx.mean.boot$t) # bootstrap media
+se.mu.vbltx <- se.muhat[1] # SE analitico
+se.boot.vbltx <- sd(vbltx.mean.boot$t)  # SE.boot
+bias.boot.vbltx <- mean(vbltx.mean.boot$t) - vbltx.mean.boot$t0  # bias
+mu.adbe <- adbe.mean.boot$t0  # estimado original
+mu.boot.adbe <- mean(adbe.mean.boot$t) # bootstrap media
+se.mu.adbe <- se.muhat[2] # SE analitico
+se.boot.adbe <- sd(adbe.mean.boot$t)  # SE.boot
+bias.boot.adbe <- mean(adbe.mean.boot$t) - adbe.mean.boot$t0  # bias
+mu.orcl <-  orcl.mean.boot$t0  # estimado original
+mu.boot.orcl <- mean(orcl.mean.boot$t) # bootstrap media
+se.mu.orcl <- se.muhat[3] # SE analitico
+se.boot.orcl <- sd(orcl.mean.boot$t)  # SE.boot
+bias.boot.orcl <- mean(orcl.mean.boot$t) - orcl.mean.boot$t0  # bias
+mu.veurx <-  veurx.mean.boot$t0  # estimado original
+mu.boot.veurx <-  mean(veurx.mean.boot$t) # bootstrap media
+se.mu.veurx <- se.muhat[4] # SE analitico
+se.boot.veurx <- sd(veurx.mean.boot$t)  # SE.boot
+bias.boot.veurx <- mean(veurx.mean.boot$t) - veurx.mean.boot$t0  # bias
+mu.veiex <-  veiex.mean.boot$t0  # estimado original
+mu.boot.veiex <- mean(veurx.mean.boot$t) # bootstrap media
+se.mu.veiex <- se.muhat[5] # SE analitico
+se.boot.veiex <- sd(veiex.mean.boot$t)  # SE.boot
+bias.boot.veiex <- mean(veiex.mean.boot$t) - veiex.mean.boot$t0  # bias
+mu.vfinx <-  vfinx.mean.boot$t0  # estimado original
+mu.boot.vfinx <- mean(vfinx.mean.boot$t) # bootstrap media
+se.mu.vfinx <- se.muhat[6] # SE analitico
+se.boot.vfinx <- sd(vfinx.mean.boot$t)  # SE.boot
+bias.boot.vfinx <-mean(vfinx.mean.boot$t) - vfinx.mean.boot$t0  # bias
+meanboot.mz <- data.frame(matrix(c(mu.vbltx,mu.boot.vbltx,se.mu.vbltx,se.boot.vbltx,bias.boot.vbltx,mu.adbe,mu.boot.adbe,se.mu.adbe,se.boot.adbe,bias.boot.adbe,
+                    mu.orcl,mu.boot.orcl,se.mu.orcl,se.boot.orcl,bias.boot.orcl,
+                    mu.veurx,mu.boot.veurx,se.mu.veurx,se.boot.veurx,bias.boot.veurx,
+                    mu.veiex,mu.boot.veiex,se.mu.veiex,se.boot.veiex,bias.boot.veiex,
+                    mu.vfinx,mu.boot.vfinx,se.mu.vfinx,se.boot.vfinx,bias.boot.vfinx),6,5,byrow=T))
+colnames(meanboot.mz) <- c("$\\hat{\\mu}$","$_{boot}\\mu$","$SE_{\\displaystyle\\hat{\\mu}}$","$SE_{boot}\\mu$","bias")
+rownames(meanboot.mz) <- asset.names
+meanboot.t <- xtable(meanboot.mz,caption="Estimados del Bootstrap de la media",label="meanboot",digits=5)
+align(meanboot.t) <- rep("c",6)
+print(meanboot.t,comment = FALSE,include.rownames =TRUE,scalebox=0.9,sanitize.text.function = function(x){x})
+@
+\textbf{Ventajas Bootstrap}
+\begin{itemize}
+  \item Menos supuestos: No necesita datos que estén normalmente distribuidos
+  \item Mayor precisión: No depende de muestras de tamaño grande a diferencia del Teorema Central del Límite
+  \item Generalidad: El mismo método aplica para un variado rango de estadísticos.
+\end{itemize}
+
+Es un buen indicio que los estimados de $SE_{\displaystyle\hat{\mu}}$ y $SE_{boot}\mu$ 
+presenten valores tan cercanos como se observa en el Cuadro \ref{meanboot}. Lo anterior supone que ambos son estimados confiables con respecto a la incertidumbre en los estimados de los parametros.
+
+\textbf{Bootstrap Desviación Estándar} 
+<<bootsd,echo=FALSE,results='asis',cache=TRUE>>=
+sd.boot = function(x, idx) {     # funcion para el bootstrap de la sd
+     ans = sd(x[idx])
+     ans
+}
+vbltx.sd.boot = boot(assetr.mz[,1], statistic = sd.boot, R=999)
+adbe.sd.boot = boot(assetr.mz[,2], statistic = sd.boot, R=999)
+orcl.sd.boot = boot(assetr.mz[,3], statistic = sd.boot, R=999)
+veurx.sd.boot = boot(assetr.mz[,4], statistic = sd.boot, R=999)
+veiex.sd.boot = boot(assetr.mz[,5], statistic = sd.boot, R=999)
+vfinx.sd.boot = boot(assetr.mz[,6], statistic = sd.boot, R=999)
+sd.vbltx <- vbltx.sd.boot$t0  # estimado original
+sd.boot.vbltx <- mean(vbltx.sd.boot$t) # bootstrap sd
+se.sigma.vblt <- se.sigmahat[1] # SE analitico
+se.bootsd.vbltx <- sd(vbltx.sd.boot$t)  # SE.boot
+bias.bootsd.vbltx <- mean(vbltx.sd.boot$t) - vbltx.mean.boot$t0  # bias
+sd.adbe <- adbe.sd.boot$t0  # estimado original
+sd.boot.adbe <- mean(adbe.sd.boot$t) # bootstrap sd
+se.sigma.adbe <- se.sigmahat[2] # SE analitico
+se.bootsd.adbe <- sd(adbe.sd.boot$t)  # SE.boot
+bias.bootsd.adbe <- mean(adbe.sd.boot$t) - adbe.sd.boot$t0  # bias
+sd.orcl <-  orcl.sd.boot$t0  # estimado original
+sd.boot.orcl <- mean(orcl.sd.boot$t) # bootstrap sd
+se.sigma.orcl <- se.sigmahat[3] # SE analitico
+se.bootsd.orcl <- sd(orcl.sd.boot$t)  # SE.boot
+bias.bootsd.orcl <- mean(orcl.sd.boot$t) - orcl.sd.boot$t0  # bias
+sd.veurx <-  veurx.sd.boot$t0  # estimado original
+sd.bootsd.veurx <-  mean(veurx.sd.boot$t) # bootstrap sd
+se.sigma.veurx <- se.sigmahat[4] # SE analitico
+se.bootsd.veurx <- sd(veurx.sd.boot$t)  # SE.boot
+bias.bootsd.veurx <- mean(veurx.sd.boot$t) - veurx.sd.boot$t0  # bias
+sd.veiex <-  veiex.sd.boot$t0  # estimado original
+sd.boot.veiex <- mean(veurx.sd.boot$t) # bootstrap sd
+se.sigma.veiex <- se.sigmahat[5] # SE analitico
+se.bootsd.veiex <- sd(veiex.sd.boot$t)  # SE.boot
+bias.bootsd.veiex <- mean(veiex.sd.boot$t) - veiex.sd.boot$t0  # bias
+sd.vfinx <-  vfinx.sd.boot$t0  # estimado original
+sd.boot.vfinx <- mean(vfinx.sd.boot$t) # bootstrap sd
+se.sigma.vfinx <- se.sigmahat[6] # SE analitico
+se.bootsd.vfinx <- sd(vfinx.sd.boot$t)  # SE.boot
+bias.bootsd.vfinx <-mean(vfinx.mean.boot$t) - vfinx.mean.boot$t0  # bias
+sigmaboot.mz <- matrix(c(sd.vbltx,sd.boot.vbltx,se.sigma.vblt,se.bootsd.vbltx,bias.bootsd.vbltx,sd.adbe,sd.boot.adbe,se.sigma.adbe,se.bootsd.adbe,bias.bootsd.adbe,
+          sd.orcl,sd.boot.orcl,se.sigma.orcl,se.bootsd.orcl,bias.bootsd.orcl,
+          sd.veurx,sd.bootsd.veurx,se.sigma.veurx,se.bootsd.veurx,bias.bootsd.veurx,
+          sd.veiex,sd.boot.veiex,se.sigma.veiex,se.bootsd.veiex,bias.bootsd.veiex,
+          sd.vfinx,sd.boot.vfinx,se.sigma.vfinx,se.bootsd.vfinx,bias.bootsd.vfinx),6,5,byrow=T)
+colnames(sigmaboot.mz) <- c("$\\hat{\\sigma}$","$_{boot}\\sigma$","$SE_{\\displaystyle\\hat{\\sigma}}$","$SE_{boot}\\sigma$","bias")
+rownames(sigmaboot.mz) <- asset.names
+sigmaboot.t <- xtable(sigmaboot.mz,caption="Estimados del Bootstrap de la Desviación Estándar",label="sigmaboot",digits=5)
+align(sigmaboot.t) <- rep("c",6)
+print(sigmaboot.t,comment = FALSE,include.rownames =TRUE,scalebox=0.9,sanitize.text.function = function(x){x})
+@
+
+\newpage
+\textbf{Bootstrap Intervalos de confianza de la media} 
+\captionsetup{format=plain,justification=centerlast}
+<<mu.boot.ci,echo=FALSE,results='asis',cache=TRUE>>=
+vbltx.boot.ci <-  boot.ci(vbltx.mean.boot, conf = 0.95, type =c("norm","perc"))
+adbe.boot.ci <-  boot.ci(adbe.mean.boot, conf = 0.95, type =c("norm","perc"))
+orcl.boot.ci <-  boot.ci(orcl.mean.boot, conf = 0.95, type =c("norm","perc"))
+veurx.boot.ci <-  boot.ci(veurx.mean.boot, conf = 0.95, type =c("norm","perc"))
+veiex.boot.ci <-  boot.ci(veiex.mean.boot, conf = 0.95, type =c("norm","perc"))
+vfinx.boot.ci <-  boot.ci(vfinx.mean.boot, conf = 0.95, type =c("norm","perc"))
+mu.boot.vbltx.lower <- vbltx.boot.ci$normal[2]
+mu.boot.vbltx.upper <- vbltx.boot.ci$normal[3]
+mu.boot.adbe.lower <- adbe.boot.ci$normal[2]
+mu.boot.adbe.upper <- adbe.boot.ci$normal[3]
+mu.boot.orcl.lower <- orcl.boot.ci$normal[2]
+mu.boot.orcl.upper <- orcl.boot.ci$normal[3]
+mu.boot.veurx.lower <- veurx.boot.ci$normal[2]
+mu.boot.veurx.upper <- veurx.boot.ci$normal[3]
+mu.boot.veiex.lower <- veiex.boot.ci$normal[2]
+mu.boot.veiex.upper <- veiex.boot.ci$normal[3]
+mu.boot.vfinx.lower <- vfinx.boot.ci$normal[2]
+mu.boot.vfinx.upper <- vfinx.boot.ci$normal[3]
+mu.boot.ci.mz <- matrix(c(mu.boot.vbltx.lower,mu.boot.vbltx.upper,mu.boot.adbe.lower,
+                       mu.boot.adbe.upper,mu.boot.orcl.lower,mu.boot.orcl.upper,
+                       mu.boot.veurx.lower,mu.boot.veurx.upper,mu.boot.veiex.lower,
+                       mu.boot.veiex.upper,mu.boot.vfinx.lower,mu.boot.vfinx.upper),
+                       6,2,byrow=T)
+mu.ci.mz  <- cbind(mu.lower,mu.upper)
+mu.boot.ci.df <- cbind(mu.boot.ci.mz,mu.ci.mz)
+colnames(mu.boot.ci.df) <- c("$_{boot}\\mu$ Inferior","$_{boot}\\mu$ Superior","$\\mu$ Inferior$","$\\mu$ Superior")
+rownames(mu.boot.ci.df) <- asset.names
+mu.boot.ci.t <- xtable(mu.boot.ci.df,caption="Estimados del Bootstrap de los Intervalos de Confianza de la media",label="muboot.ci",digits=5)
+align(mu.boot.ci.t) <- rep("c",5)
+print(mu.boot.ci.t,comment = FALSE,include.rownames =TRUE,scalebox=0.9,sanitize.text.function = function(x){x})
+@
+
+\textbf{Bootstrap Intervalos de confianza Desviación Estándar} 
+<<sd.boot.ci,echo=FALSE, results='asis',cache=TRUE>>=
+vbltx.bootsd.ci <-  boot.ci(vbltx.sd.boot, conf = 0.95, type =c("norm","perc"))
+adbe.bootsd.ci <-  boot.ci(adbe.sd.boot, conf = 0.95, type =c("norm","perc"))
+orcl.bootsd.ci <-  boot.ci(orcl.sd.boot, conf = 0.95, type =c("norm","perc"))
+veurx.bootsd.ci <-  boot.ci(veurx.sd.boot, conf = 0.95, type =c("norm","perc"))
+veiex.bootsd.ci <-  boot.ci(veiex.sd.boot, conf = 0.95, type =c("norm","perc"))
+vfinx.bootsd.ci <-  boot.ci(vfinx.sd.boot, conf = 0.95, type =c("norm","perc"))
+sd.boot.vbltx.lower <- vbltx.bootsd.ci$normal[2]
+sd.boot.vbltx.upper <- vbltx.bootsd.ci$normal[3]
+sd.boot.adbe.lower <- adbe.bootsd.ci$normal[2]
+sd.boot.adbe.upper <- adbe.bootsd.ci$normal[3]
+sd.boot.orcl.lower <- orcl.bootsd.ci$normal[2]
+sd.boot.orcl.upper <- orcl.bootsd.ci$normal[3]
+sd.boot.veurx.lower <- veurx.bootsd.ci$normal[2]
+sd.boot.veurx.upper <- veurx.bootsd.ci$normal[3]
+sd.boot.veiex.lower <- veiex.bootsd.ci$normal[2]
+sd.boot.veiex.upper <- veiex.bootsd.ci$normal[3]
+sd.boot.vfinx.lower <- vfinx.bootsd.ci$normal[2]
+sd.boot.vfinx.upper <- vfinx.bootsd.ci$normal[3]
+sd.boot.ci.mz <- matrix(c(sd.boot.vbltx.lower,sd.boot.vbltx.upper,sd.boot.adbe.lower,
+                          sd.boot.adbe.upper,sd.boot.orcl.lower,sd.boot.orcl.upper,
+                          sd.boot.veurx.lower,sd.boot.veurx.upper,sd.boot.veiex.lower,
+                          sd.boot.veiex.upper,sd.boot.vfinx.lower,sd.boot.vfinx.upper),
+                        6,2,byrow=T)
+sd.ci.mz  <- cbind(sigma.lower,sigma.upper)
+sd.boot.ci.df <- cbind(sd.boot.ci.mz,sd.ci.mz)
+colnames(sd.boot.ci.df) <- c("$_{boot}\\sigma$ Inferior","$_{boot}\\sigma$ Superior","$\\sigma$ Inferior$","$\\sigma$ Superior")
+rownames(sd.boot.ci.df) <- asset.names
+sd.boot.ci.t <- xtable(sd.boot.ci.df,caption="Estimados del Bootstrap de los Intervalos de Confianza de la Desviación Estándar",label="sdboot.ci",digits=5)
+align(sd.boot.ci.t) <- rep("c",5)
+print(sd.boot.ci.t,comment = FALSE,include.rownames =TRUE,scalebox=0.9,sanitize.text.function = function(x){x})
+@
+
+\newpage
+\section{Value-at-Risk(VaR)}
+\subsection{VaR Parametrico}
+\begin{itemize}
+  \item Especifica una distribución paramétrica para los retornos
+  \item Estima parámetros de distribución
+  \item Estima medidas de riesgo como funciones de los parámetros estimados
+\end{itemize}
+
+
+<<VaR, echo=FALSE,results='asis',cache=TRUE>>=
+Value.at.Risk = function(x,p=0.05,w=100000) {         # funcion VaR
+  x = as.matrix(x)
+	q = apply(x, 2, mean) + apply(x, 2, sd)*qnorm(p)
+	VaR = (exp(q) - 1)*w
+	VaR
+}
+# 5% y 1% VaR mensuales estimados basados en  W0 = 100000
+VaR5 <- Value.at.Risk(assetr.mz,p=0.05,w=100000)
+VaR1 <- Value.at.Risk(assetr.mz,p=0.01,w=100000)
+VaR.df <- cbind(VaR1,VaR5)
+
+# 5% y 1% VaR anuales estimados basados en  W0 = 100000 
+Value.at.Risk.yr = function(x,p=0.05,w=100000) {           # funcion VaR anual
+  x = as.matrix(x)
+  q = (apply(x, 2, mean))*12 + sqrt(apply(x, 2, sd)*12)*qnorm(p)
+  VaR = (exp(q) - 1)*w
+  VaR
+}
+VaR5.yr <- Value.at.Risk.yr(assetr.mz,p=0.05,w=100000)
+VaR1.yr <- Value.at.Risk.yr(assetr.mz,p=0.01,w=100000)
+VaR.yr.df <- cbind(VaR1.yr,VaR5.yr)
+VaR.dff <- cbind(VaR.df,VaR.yr.df)
+colnames(VaR.dff) <- c("VaR$1\\%$","VaR$5\\%$","VaR$1\\%$ Anual","VaR$5\\%$ Anual")
+rownames(VaR.dff) <- asset.names
+VaR.t <- xtable(VaR.dff,caption="VaR$1\\%$,$5\\%$ Mensual y Anual",label="VaR",digits=2)
+align(VaR.t) <- rep("c",5)
+print(VaR.t,comment = FALSE,include.rownames =TRUE,scalebox=0.9,sanitize.text.function = function(x){x},booktabs=TRUE)
+@
+
+
+\subsection{VaR no Paramétrico/Simulación Histórica}
+\begin{itemize}
+  \item Usa la distribución histórica para estimar las medidas de riesgo (VaR)
+\end{itemize}
+
+
+<<VaR.hs,echo=FALSE,results='asis',cache=TRUE>>=
+## Mediddas de riesgo no parametricas
+## 5% y 1% Cuantiles Empiricos (VaR Historica)
+q.hs <- apply(assetr.mz, 2, quantile, probs=c(0.01, 0.05))
+rownames(q.hs) <- c("q.01","q.05")
+VaR.hs <- 100000*(exp(q.hs) - 1)
+VaR.hs.df <- t(rbind(q.hs,VaR.hs))
+colnames(VaR.hs.df) <- c("$\\hat{q}_{0.01}^R$","$\\hat{q}_{0.05}^R$","$VaR_{0.01}^{HS}$","$VaR_{0.05}^{HS}$")
+rownames(VaR.hs.df) <- asset.names
+VaRhs.t <- xtable(VaR.hs.df,digits=2,caption="$VaR_{0.01}^{HS}$ , $VaR_{0.05}^{HS}$ mensual Simulación \\\\ Histórica ")
+align(VaRhs.t) <- rep("c",5)
+print(VaRhs.t,comment = FALSE,include.rownames =TRUE,scalebox=0.9,sanitize.text.function = function(x){x},booktabs=TRUE)
+@
+
+
+\newpage\section{Teoría de Portafolios}
+\subsection{Portafolio Global de la mínima varianza con cortos}
+<<minglob,echo=FALSE>>=
+# portafolio gmv con cortos
+gmv <- globalMin.portfolio(muhat.vals, sigma.mat)
+gmv.p <- as.data.frame(gmv$weights)
+gmv.p$activos <- row.names(gmv.p)
+gmv.p <- data.frame(activos=gmv.p[,2],pesos=gmv.p[,1])
+
+# Retornos, Desviacion estandar Portafolio con cortos
+mu.gmv <- gmv$er
+sd.gmv <- gmv$sd
+VaRs.gmv05 <- (exp(mu.gmv+sd.gmv*qnorm(0.05))-1)*100000
+VaRs.gmv01 <- (exp(mu.gmv+sd.gmv*qnorm(0.01))-1)*100000
+sharpe.gmv <- (mu.gmv-rf.m)/sd.gmv
+gmvs.df <- rbind(mu.gmv,sd.gmv,VaRs.gmv05,VaRs.gmv01,sharpe.gmv)
+
+# Retornos, Desviacion estandar Portafolio con cortos(anuales)
+mu.gmv.y <- mu.gmv*12
+sd.gmv.y <- sqrt(sd.gmv*12)
+VaRs.gmv05.y <- (exp(mu.gmv.y+sd.gmv.y*qnorm(0.05))-1)*100000
+VaRs.gmv01.y <- (exp(mu.gmv.y+sd.gmv.y*qnorm(0.01))-1)*100000
+sharpe.gmv.y <- (mu.gmv.y-rf)/sd.gmv.y
+gmvs.df.y <- rbind(mu.gmv.y,sd.gmv.y,VaRs.gmv05.y,VaRs.gmv01.y,sharpe.gmv.y)
+
+# tabla gmv con cortos retornos
+gmv.df <- data.frame(r.mensuales=gmvs.df[,1] ,r.anuales=gmvs.df.y[,1])
+gmv.df$r.mensuales[c(1,2,5)] <- percent(as.numeric(as.character(gmv.df$r.mensuales[c(1,2,5)])))
+gmv.df$r.mensuales[c(3,4)] <- dollar(as.numeric(as.character(gmv.df$r.mensuales[c(3,4)])))
+gmv.df$r.anuales[c(1,2,5)] <- percent(as.numeric(as.character(gmv.df$r.anuales[c(1,2,5)])))
+gmv.df$r.anuales[c(3,4)] <- dollar(as.numeric(as.character(gmv.df$r.anuales[c(3,4)])))
+@
+
+\begin{figure}[!h]
+\CenterFloatBoxes   % alinea las cajas verticalmente
+\begin{floatrow}
+\ffigbox{
+<<gmv.s,echo=FALSE, warning=FALSE,cache=TRUE>>=
+ggplot(gmv.p,aes(x=activos,y=pesos)) +
+    geom_bar(stat = "identity", fill = "navy") + 
+    geom_text(aes(label = paste(round(pesos,2) * 100, "%"),
+                vjust = ifelse(pesos >= 0, -0.5, 1.2))) +
+    scale_y_continuous("Pesos del Portafolio", labels = percent,
+                       breaks=pretty_breaks(n=8)) +
+    theme(axis.title.x = element_blank(),
+          title=element_text(vjust=0.9)) +
+    ggtitle("Portafolio Global Mínima Varianza con Cortos")
+@
+}{\caption{Pesos de activos GMV (con cortos)} }
+\capbtabbox{
+<<gmv.r,echo=FALSE,results='asis'>>=
+colnames(gmv.df) <- c("R. Mensual","R. Anualizado")
+rownames(gmv.df) <- c("E[Rp]","SD[Rp]","VaR 5$\\%$","VaR 1$\\%$","Sharpe")
+gmv.t <- xtable(gmv.df)
+align(gmv.t) <- "ccc"
+print(gmv.t,comment = FALSE,include.rownames =TRUE,scalebox=0.9,sanitize.rownames.function = function(x){x},booktabs=TRUE,floating=FALSE)
+@
+}{ \caption{GMV Retorno Mensual y Anualizado} }
+\end{floatrow} 
+\end{figure} 
+
+\subsection{Portafolio eficiente}
+<<ef.p , echo=FALSE>>=
+# portafolio eficiente con el retorno esperado mas alto(Markowitz)
+target.return <- muhat.vals[muhat.vals ==max(muhat.vals)]
+ef.s <- efficient.portfolio(muhat.vals, sigma.mat, target.return)
+ef.sh <- as.data.frame(ef.s$weights)
+ef.sh$activos <- row.names(ef.sh)
+ef.sh.df <- data.frame(activos=ef.sh[,2],pesos=ef.sh[,1])
+
+# Retornos, Desviacion estandar Portafolio eficiente con cortos
+mu.ef <- ef.s$er
+sd.ef <- ef.s$sd
+e.VaRs.05 <- (exp(mu.ef+sd.ef*qnorm(0.05))-1)*100000
+e.VaRs.01 <- (exp(mu.ef+sd.ef*qnorm(0.01))-1)*100000
+sharpe.ef <- (mu.ef-rf.m)/sd.ef
+ef.df <- rbind(mu.ef,sd.ef,e.VaRs.05 ,e.VaRs.01,sharpe.ef)
+
+# Retornos, Desviacion estandar Portafolio eficiente con cortos (anuales)
+mu.ef.y <- mu.ef*12
+sd.ef.y <- sqrt(sd.ef*12)
+e.VaRs.05.y <- (exp(mu.ef.y+sd.ef.y*qnorm(0.05))-1)*100000
+e.VaRs.01.y <- (exp(mu.ef.y+sd.ef.y*qnorm(0.01))-1)*100000
+sharpe.ef.y <- (mu.ef.y-rf)/sd.ef.y
+ef.df.y <- rbind(mu.ef.y,sd.ef.y,e.VaRs.05.y ,e.VaRs.01.y,sharpe.ef.y)
+
+# tabla ef.p con cortos retornos
+efs.df <- data.frame(r.mensuales=ef.df[,1] ,r.anuales=ef.df.y[,1])
+efs.df$r.mensuales[c(1,2,5)] <- percent(as.numeric(as.character(efs.df$r.mensuales[c(1,2,5)])))
+efs.df$r.mensuales[c(3,4)] <- dollar(as.numeric(as.character(efs.df$r.mensuales[c(3,4)])))
+efs.df$r.anuales[c(1,2,5)] <- percent(as.numeric(as.character(efs.df$r.anuales[c(1,2,5)])))
+efs.df$r.anuales[c(3,4)] <- dollar(as.numeric(as.character(efs.df$r.anuales[c(3,4)])))
+@
+\vspace{-10}
+\begin{figure}[!h]
+\CenterFloatBoxes   % alinea las cajas verticalmente
+\begin{floatrow}
+\ffigbox{
+<<ef.sh,echo=FALSE, warning=FALSE,cache=TRUE>>=
+ggplot(ef.sh.df,aes(x=activos,y=pesos)) +
+  geom_bar(stat = "identity", fill = "navy") + 
+  geom_text(aes(label = paste(round(pesos,2) * 100, "%"),
+                vjust = ifelse(pesos >= 0, -0.5, 1.2))) +
+  scale_y_continuous("Pesos del Portafolio", labels = percent,
+                     breaks=pretty_breaks(n=8)) +
+  theme(axis.title.x = element_blank(),
+        title=element_text(vjust=0.9)) +
+  ggtitle("Portafolio Eficiente ")
+@
+}{\caption{Portafolio Eficiente retorno objetivo igual al activo con el retorno mas alto} }
+\capbtabbox{
+<<ef.r,echo=FALSE,results='asis'>>=
+colnames(efs.df) <- c("R. Mensual","R. Anualizado")
+rownames(efs.df) <- c("E[Rp]","SD[Rp]","VaR 5$\\%$","VaR 1$\\%$","Sharpe")
+efs.t <- xtable(efs.df)
+align(efs.t) <- "ccc"
+print(efs.t,comment = FALSE,include.rownames =TRUE,scalebox=0.9,sanitize.rownames.function = function(x){x},booktabs=TRUE,floating=FALSE)
+@
+}{ \caption{Portafolio eficiente Retorno Mensual y Anualizado} }
+\end{floatrow} 
+\end{figure} 
+
+\newpage
+\subsection{Portafolio de la Tangente con cortos}
+<<tan,echo=FALSE,cache=TRUE>>=
+# PORTAFOLIO DE LA TANGENTE
+rf <- 0.005 # anual
+rf.m <- rf/12 # mensual
+t.port <- tangency.portfolio(muhat.vals, sigma.mat, rf.m)
+t.port.s <- as.data.frame(t.port$weights)
+t.port.s$activos <- row.names(t.port.s)
+t.port.s <- data.frame(activos=t.port.s[,2],pesos=t.port.s[,1])
+
+# Retornos, Desviacion estandar Portafolio tangente con cortos
+mu.t <- t.port$er
+sig.t <- t.port$sd
+t.VaRs.05 <- (exp(mu.t+sig.t*qnorm(0.05))-1)*100000
+t.VaRs.01 <- (exp(mu.t+sig.t*qnorm(0.01))-1)*100000
+sharpe.t <- (mu.t-rf.m)/sig.t
+t.df <- rbind(mu.t,sig.t ,t.VaRs.05 ,t.VaRs.01,sharpe.t)
+
+# Retornos, Desviacion estandar Portafolio tangente con cortos (anuales)
+mu.t.y <- mu.t*12
+sig.t.y <- sqrt(sig.t*12)
+t.VaRs.05.y <- (exp(mu.t.y+sig.t.y*qnorm(0.05))-1)*100000
+t.VaRs.01.y <- (exp(mu.t.y+sig.t.y*qnorm(0.01))-1)*100000
+sharpe.t.y <- (mu.t.y-rf)/sig.t.y
+t.df.y <- rbind(mu.t.y,sig.t.y ,t.VaRs.05.y ,t.VaRs.01.y,sharpe.t.y)
+
+# tabla t.port con cortos retornos
+tp.df <- data.frame(r.mensuales=t.df[,1] ,r.anuales=t.df.y[,1])
+tp.df$r.mensuales[c(1,2,5)] <- percent(as.numeric(as.character(tp.df$r.mensuales[c(1,2,5)])))
+tp.df$r.mensuales[c(3,4)] <- dollar(as.numeric(as.character(tp.df$r.mensuales[c(3,4)])))
+tp.df$r.anuales[c(1,2,5)] <- percent(as.numeric(as.character(tp.df$r.anuales[c(1,2,5)])))
+tp.df$r.anuales[c(3,4)] <- dollar(as.numeric(as.character(tp.df$r.anuales[c(3,4)])))
+@
+\vspace{-10}
+\begin{figure}[!h]
+\CenterFloatBoxes   % alinea las cajas verticalmente
+\begin{floatrow}
+\ffigbox{
+<<t.port,echo=FALSE, warning=FALSE,cache=TRUE>>=
+ggplot(t.port.s,aes(x=activos,y=pesos)) +
+  geom_bar(stat = "identity", fill = "navy") + 
+  geom_text(aes(label = paste(round(pesos,2) * 100, "%"),
+                vjust = ifelse(pesos >= 0, -0.5, 1.2))) +
+  scale_y_continuous("Pesos del Portafolio", labels = percent,
+                     breaks=pretty_breaks(n=8)) +
+  theme(axis.title.x = element_blank(),
+        title=element_text(vjust=0.9)) +
+  ggtitle("Portafolio de T-Bills y la Tangente con cortos")
+@
+}{\caption{Portafolio de la Tangente} }
+\capbtabbox{
+<<t.port.r,echo=FALSE,results='asis',cache=TRUE>>=
+colnames(tp.df) <- c("R. Mensual","R. Anualizado")
+rownames(tp.df) <- c("E[Rp]","SD[Rp]","VaR 5$\\%$","VaR 1$\\%$","Sharpe")
+tp.t <- xtable(tp.df)
+align(tp.t) <- "ccc"
+print(tp.t,comment = FALSE,include.rownames =TRUE,scalebox=0.9,sanitize.rownames.function = function(x){x},booktabs=TRUE,floating=FALSE)
+@
+}{ \caption{Portafolio de la Tangente Retorno Mensual y Anualizado} }
+\end{floatrow} 
+\end{figure} 
+
+
+\subsection{Frontera Eficiente}
+\vspace{-20}
+<<f.ef,echo=FALSE, cache=TRUE>>=
+# Frontera eficiente
+x.vec <- ef.s$weights
+mu.px <- ef.s$er
+sig2.px <- (ef.s$sd)^2
+
+m.vec <- gmv$weights
+mu.gmin <- gmv$er
+sig2.gmin <- gmv$sd^2
+
+a = seq(from=1, to=-1, by=-0.1)
+n.a = length(a)
+z.mat = matrix(0, n.a, 6)
+colnames(z.mat) <- asset.names
+mu.z = rep(0, n.a)
+sig2.z = rep(0, n.a)
+sig.mx = t(m.vec)%*%sigma.mat%*%x.vec
+for (i in 1:n.a) {
+            z.mat[i, ] = a[i]*m.vec + (1-a[i])*x.vec
+            mu.z[i] = a[i]*mu.gmin + (1-a[i])*mu.px
+            sig2.z[i] = a[i]^2 * sig2.gmin + (1-a[i])^2 * sig2.px +
+            2*a[i]*(1-a[i])*sig.mx
+}
+# grafica portafolio eficiente de activos y activo libre de riesgo
+front.efi <- data.frame(mu=mu.z,sigma=sqrt(sig2.z))
+asset.df <- data.frame(mu=muhat.vals,sigma=sigmahat.vals)
+ef.port <- data.frame(mu=ef.s$er,sigma=ef.s$sd)
+t.portf <- data.frame(mu=t.port$er,sigma=t.port$sd)
+t.sharpe <- (t.port$er - rf.m)/t.port$sd
+rf.df <- data.frame(rf.m,t.sharpe)
+@
+\begin{figure}[!h]
+\begin{floatrow}
+\ffigbox{
+<<Frontera.efi,echo=FALSE,cache=TRUE>>=
+ggplot(data=rbind(front.efi,asset.df,ef.port,t.portf),aes(x=sigma,y=mu)) +
+  geom_point(colour="blue") +
+  geom_point(data=subset(front.efi, sigma==min(sigma)),colour="red",size=3) +
+  geom_point(data=asset.df,aes(x=sigma,y=mu),
+             colour="orange",size=3) +
+  geom_point(data=ef.port,aes(x=sigma,y=mu),colour="green",size=3) +
+  geom_point(data=t.portf,aes(x=sigma,y=mu),colour="green",size=3.2) +
+  annotate("text", x=0.021, y=0.0092, label="GMV", color="red")+
+  geom_text(data=asset.df,aes(label=row.names(asset.df)),
+            hjust=0, vjust=-0.4) +
+  geom_text(data=ef.port,aes(label="ef"),
+            hjust=1.2, vjust=-0.3) +
+  geom_text(data=t.portf,aes(label="tangente"),
+            hjust=-0.2, vjust=0.3) +
+  annotate("text", x=0.03, y=0.027, label="Portafolios de T-Bills y
+           Portafolio Tangente", color="red") +
+  annotate("text", x=0.073, y=0.022, label="Frontera Eficiente 
+           (Sin T-Bills)", color="red") +
+  geom_abline(data=rf.df, aes(slope=t.sharpe,intercept=rf.m),colour="navy") +
+  scale_y_continuous(labels = percent,breaks=pretty_breaks(n=10)) +
+  scale_x_continuous(labels = percent,breaks=pretty_breaks(n=10))
+@
+}{\caption{Portafolios Eficientes con un activo libre de Riesgo} }
+\end{floatrow}
+\end{figure}
+
+\newpage
+\subsection{Pesos de Portafolios Eficientes sin Activos libres de Riesgo(T-Bills)}
+\vspace{-20pt}
+<<Pesosp,echo=F,results='asis', fig.height=4,fig.width=8,fig.align='center',fig.cap="Pesos Portafolios Eficientes",fig.pos="h",warning=FALSE,cache=TRUE>>=
+ef.w <- data.frame(z.mat,sigma=factor(round(sqrt(sig2.z),4)*100))
+ef.melt <- melt(ef.w,id="sigma", measure.vars=c("vbltx","adbe","orcl",
+          "veurx","veiex","vfinx"),value.name="pesos",variable.name="activos")
+ef.p1 <- subset(ef.melt,pesos >= 0)
+ef.p2 <- subset(ef.melt,pesos < 0)
+
+ggplot() + geom_bar(data=ef.p1,aes(x=sigma,y=pesos,
+                            fill=activos),stat = "identity") +
+  geom_bar(data=ef.p2 ,aes(x=sigma,y=pesos,
+                            fill=activos),stat = "identity") +
+  scale_fill_brewer(type = "seq", palette = "BrBG") +
+  scale_y_continuous(labels = percent,breaks=pretty_breaks(n=10)) + 
+  ggtitle("Pesos Portafolios Eficientes") + 
+  xlab("Portafolio Desviación Estandar") +
+  theme(title=element_text(vjust=0.9,size=9),axis.title.x=
+          element_text(vjust=-0.5),axis.text=element_text(size=7)) 
+  
+@
+\vspace{-10pt}
+\subsection{Pesos de Portafolios Eficientes con Activos libres de Riesgo (T-Bills)}
+\vspace{-20pt}
+<<Pesos.T,echo=F,results='asis', fig.height=3.4,fig.width=8,fig.align='center',fig.cap="Portafolios Eficientes T-bills y portafolio de la tangente",fig.pos="h",warning=FALSE,cache=TRUE>>=
+# portafolios eficientes de t-bills y Portafolio de la Tangente
+x.t = seq(0, 2, by=0.1)
+mu.pe = rf.m + x.t*(mu.t  - rf.m)
+sig.pe = x.t*sig.t 
+slope.t = (mu.t - rf.m)/sig.t
+
+# plot weights
+t.vec <- t.port$weights
+t.mat = x.t %o% t.vec
+e.mat = cbind(1-x.t, t.mat)
+colnames(e.mat)[1] = "T-Bill"
+
+t.w <- data.frame(e.mat,sigma=factor(round(sig.pe,4)*100))
+t.melt <- melt(t.w,id="sigma", measure.vars=c( "T.Bill","vbltx","adbe","orcl",
+      "veurx","veiex","vfinx"),value.name="pesos",variable.name="activos")
+t.p1 <- subset(t.melt,pesos >= 0)
+t.p2 <- subset(t.melt,pesos < 0)
+
+ggplot() + geom_bar(data=t.p1,aes(x=sigma,y=pesos,
+                                   fill=activos),stat = "identity") +
+  geom_bar(data=t.p2 ,aes(x=sigma,y=pesos,
+                           fill=activos),stat = "identity") +
+  scale_fill_brewer(type = "seq", palette = "BrBG") +
+  scale_y_continuous(labels = percent,breaks=pretty_breaks(n=10)) + 
+  ggtitle("Pesos Portafolios Eficientes de T-Bills y Portafolio de la Tangente") +
+  xlab("Portafolio Desviación Estandar") +
+  theme(title=element_text(vjust=0.9,size=9),axis.title.x =
+          element_text(vjust=-0.5),axis.text=element_text(size=7)) 
+  
+@
+
+hthththththhththththhtht
+thththhththththththt
+
+
+\newpage
+\subsection{Portafolio Global de la mínima varianza sin cortos}
+<<gmv.ns,echo=FALSE>>=
+# portafolio gmv sin cortos
+gmv.ns <- globalMin.portfolio(muhat.vals, sigma.mat,shorts=FALSE)
+gmv.nsh <- as.data.frame(gmv.ns$weights)
+gmv.nsh$activos <- row.names(gmv.nsh)
+gmv.nsh <- data.frame(activos=gmv.nsh[,2],pesos=gmv.nsh[,1])
+
+# Retornos, Desviacion estandar Portafolio sin cortos
+mu.gmv.ns <- gmv.ns$er
+sd.gmv.ns <- gmv.ns$sd
+VaRns.gmv05 <- (exp(mu.gmv.ns+sd.gmv.ns*qnorm(0.05))-1)*100000
+VaRns.gmv01 <- (exp(mu.gmv.ns+sd.gmv.ns*qnorm(0.01))-1)*100000
+sharpe.gmvns <- (mu.gmv.ns-rf.m)/sd.gmv.ns
+gmvns.df <- rbind(mu.gmv.ns,sd.gmv.ns,VaRns.gmv05,VaRns.gmv01,sharpe.gmvns)
+
+# Retornos, Desviacion estandar Portafolio sin cortos
+mu.gmv.ns.y <- mu.gmv.ns*12
+sd.gmv.ns.y <- sqrt(sd.gmv.ns*12)
+VaRns.gmv05.y <- (exp(mu.gmv.ns.y+sd.gmv.ns.y*qnorm(0.05))-1)*100000
+VaRns.gmv01.y <- (exp(mu.gmv.ns.y+sd.gmv.ns.y*qnorm(0.01))-1)*100000
+sharpe.gmvns.y <- (mu.gmv.ns.y-rf)/sd.gmv.ns.y
+gmvns.df.y <- rbind(mu.gmv.ns.y,sd.gmv.ns.y,VaRns.gmv05.y,VaRns.gmv01.y,sharpe.gmvns.y)
+
+# tabla gmv sin cortos retornos
+gmvns.df <- data.frame(r.mensuales=gmvns.df[,1] ,r.anuales=gmvns.df.y[,1])
+gmvns.df$r.mensuales[c(1,2,5)] <- percent(as.numeric(as.character(gmvns.df$r.mensuales[c(1,2,5)])))
+gmvns.df$r.mensuales[c(3,4)] <- dollar(as.numeric(as.character(gmvns.df$r.mensuales[c(3,4)])))
+gmvns.df$r.anuales[c(1,2,5)] <- percent(as.numeric(as.character(gmvns.df$r.anuales[c(1,2,5)])))
+gmvns.df$r.anuales[c(3,4)] <- dollar(as.numeric(as.character(gmvns.df$r.anuales[c(3,4)])))
+@
+
+\begin{figure}[!h]
+\CenterFloatBoxes   % alinea las cajas verticalmente
+\begin{floatrow}
+\ffigbox{
+<<gmv.nsh,echo=FALSE>>=
+ggplot(gmv.nsh,aes(x=activos,y=pesos)) +
+    geom_bar(stat = "identity", fill = "navy") + 
+    geom_text(aes(label = paste(round(pesos,2) * 100, "%"),
+                vjust = ifelse(pesos >= 0, -0.5, 1.2))) +
+    scale_y_continuous("Pesos del Portafolio", labels = percent,
+                       breaks=pretty_breaks(n=8)) +
+    theme(axis.title.x = element_blank(),
+          title=element_text(vjust=0.9)) +
+    ggtitle("Portafolio Global Mínima Varianza sin Cortos")
+@
+}{\caption{GMV sin cortos} }
+\capbtabbox{
+<<gmv.snh.r,echo=FALSE,results='asis'>>=
+colnames(gmvns.df) <- c("R. Mensual","R. Anualizado")
+rownames(gmvns.df) <- c("E[Rp]","SD[Rp]","VaR 5$\\%$","VaR 1$\\%$","sharpe")
+gmvns.t <- xtable(gmvns.df)
+align(gmvns.t) <- "ccc"
+print(gmvns.t,comment = FALSE,include.rownames =TRUE,scalebox=0.9,sanitize.rownames.function = function(x){x},booktabs=TRUE,floating=FALSE)
+@
+}{ \caption{GMV sin cortos Retorno Mensual y Anualizado} }
+\end{floatrow} 
+\end{figure}
+
+\subsection{Portafolio de la Tangente sin cortos}
+<<tan.ns,echo=FALSE>>=
+# PORTAFOLIO DE LA TaNGENTE sin cortos
+t.port.n <- tangency.portfolio(muhat.vals, sigma.mat, rf.m,shorts=F)
+t.port.ns <- as.data.frame(t.port.n$weights)
+t.port.ns$activos <- row.names(t.port.ns)
+t.port.ns <- data.frame(activos=t.port.ns[,2],pesos=t.port.ns[,1])
+
+# Retornos, Desviacion estandar Portafolio tangente sin cortos
+mu.tns <- t.port.n$er
+sig.tns <- t.port.n$sd
+t.VaRns.05 <- (exp(mu.tns+sig.tns*qnorm(0.05))-1)*100000
+t.VaRns.01 <- (exp(mu.tns+sig.tns*qnorm(0.01))-1)*100000
+sharpe.tn <- (mu.tns-rf.m)/sig.tns
+t.df.n <- rbind(mu.tns,sig.tns ,t.VaRns.05 ,t.VaRns.01,sharpe.tn)
+
+# Retornos, Desviacion estandar Portafolio tangente sin cortos (anuales)
+mu.tns.y <- mu.tns*12
+sig.tns.y <- sqrt(sig.tns*12)
+t.VaRns.05.y <- (exp(mu.tns.y+sig.tns.y*qnorm(0.05))-1)*100000
+t.VaRns.01.y <- (exp(mu.tns.y+sig.tns.y*qnorm(0.01))-1)*100000
+sharpe.tn.y <- (mu.tns.y-rf)/sig.tns.y
+t.dfns.y <- rbind(mu.tns.y,sig.tns.y ,t.VaRns.05.y ,t.VaRns.01.y,sharpe.tn.y)
+
+# tabla t.port sin cortos retornos
+tns.df <- data.frame(r.mensuales=t.df.n[,1] ,r.anuales=t.dfns.y[,1])
+tns.df$r.mensuales[c(1,2,5)] <- percent(as.numeric(as.character(tns.df$r.mensuales[c(1,2,5)])))
+tns.df$r.mensuales[c(3,4)] <- dollar(as.numeric(as.character(tns.df$r.mensuales[c(3,4)])))
+tns.df$r.anuales[c(1,2,5)] <- percent(as.numeric(as.character(tns.df$r.anuales[c(1,2,5)])))
+tns.df$r.anuales[c(3,4)] <- dollar(as.numeric(as.character(tns.df$r.anuales[c(3,4)])))
+@
+\vspace{-10}
+\begin{figure}[!h]
+\CenterFloatBoxes   % alinea las cajas verticalmente
+\begin{floatrow}
+\ffigbox{
+<<tan.nsh,echo=FALSE, warning=FALSE,cache=TRUE>>=
+ggplot(t.port.ns,aes(x=activos,y=pesos)) +
+  geom_bar(stat = "identity", fill = "navy") + 
+  geom_text(aes(label = paste(round(pesos,2) * 100, "%"),
+                vjust = ifelse(pesos >= 0, -0.5, 1.2))) +
+  scale_y_continuous("Pesos del Portafolio", labels = percent,
+                     breaks=pretty_breaks(n=8)) +
+  theme(axis.title.x = element_blank(),
+        title=element_text(vjust=0.9)) +
+  ggtitle("Portafolio de la Tangente sin cortos")
+@
+}{\caption{Portafolio de la Tangente sin cortos} }
+\capbtabbox{
+<<tan.nsh.r,echo=FALSE,results='asis'>>=
+colnames(tns.df) <- c("R. Mensual","R. Anualizado")
+rownames(tns.df) <- c("E[Rp]","SD[Rp]","VaR 5$\\%$","VaR 1$\\%$","Sharpe")
+tns.t <- xtable(tns.df)
+align(tns.t) <- "ccc"
+print(tns.t,comment = FALSE,include.rownames =TRUE,scalebox=0.9,sanitize.rownames.function = function(x){x},booktabs=TRUE,floating=FALSE)
+@
+}{ \caption{Portafolio de la Tangente sin cortos Retorno Mensual y Anualizado} }
+\end{floatrow} 
+\end{figure} 
+
+\section{Asignación de Activos}
+\subsection{Portafolio Eficiente Retorno Objetivo 9$\%$ anual}
+<<tr.14,echo=FALSE>>=
+# portafolio eficiente2 con el retorno objetivo anual 9% sin cortos
+target.return2 <- 0.09/12
+ef2.nsh <- efficient.portfolio(muhat.vals, sigma.mat, target.return2,shorts=F)
+ef2.ns <- as.data.frame(ef2.nsh$weights)
+ef2.ns$activos <- row.names(ef2.ns)
+ef2.ns.df <- data.frame(activos=ef2.ns[,2],pesos=ef2.ns[,1])
+
+# Retornos, Desviacion estandar Portafolio eficiente con cortos
+mu.ef2 <- ef2.nsh$er
+sd.ef2 <- ef2.nsh$sd
+e2.VaRns.05 <- (exp(mu.ef2+sd.ef2*qnorm(0.05))-1)*100000
+e2.VaRns.01 <- (exp(mu.ef2+sd.ef2*qnorm(0.01))-1)*100000
+ef.sharpe <- (mu.ef2 - rf.m)/sd.ef2
+ef2ns.df <- rbind(mu.ef2,sd.ef2,e2.VaRns.05 ,e2.VaRns.01,ef.sharpe)
+
+# Retornos, Desviacion estandar Portafolio eficiente con cortos (anuales)
+mu.ef2.y <- mu.ef2*12
+sd.ef2.y <- sqrt(sd.ef2*12)
+e2.VaRns.05.y <- (exp(mu.ef2.y+sd.ef2.y*qnorm(0.05))-1)*100000
+e2.VaRns.01.y <- (exp(mu.ef2.y+sd.ef2.y*qnorm(0.01))-1)*100000
+ef.sharpe.y <- (mu.ef2.y - rf)/sd.ef2.y
+ef2ns.df.y <- rbind(mu.ef2.y,sd.ef2.y,e2.VaRns.05.y ,e2.VaRns.01.y,ef.sharpe.y)
+
+# tabla portafolio eficiente retorno objetivo 9%
+p.ef.df <- data.frame(r.mensuales=ef2ns.df[,1] ,r.anuales=ef2ns.df.y[,1])
+@
+\vspace{-15pt}
+\begin{figure}[!h]
+\CenterFloatBoxes   % alinea las cajas verticalmente
+\begin{floatrow}
+\ffigbox{
+<<p.ef,echo=FALSE, warning=FALSE,cache=TRUE>>=
+ggplot(ef2.ns.df,aes(x=activos,y=pesos)) +
+  geom_bar(stat = "identity", fill = "navy") + 
+  geom_text(aes(label = paste(round(pesos,2) * 100, "%"),
+                vjust = ifelse(pesos >= 0, -0.5, 1.2))) +
+  scale_y_continuous("Pesos del Portafolio", labels = percent,
+                     breaks=pretty_breaks(n=8)) +
+  theme(axis.title.x = element_blank(),
+        title=element_text(vjust=0.9)) +
+  ggtitle("Portafolio Eficiente")
+@
+}{\caption{Portafolio Eficiente sin cortos con Retorno Objetivo del 9$\%$ anual} }
+\capbtabbox{
+<<p.ef.t,echo=FALSE,results='asis',cache=TRUE>>=
+colnames(p.ef.df) <- c("R. Mensual","R. Anualizado")
+rownames(p.ef.df) <- c("E[Rp]","SD[Rp]","VaR 5$\\%$","VaR 1$\\%$","Sharpe")
+pef.t <- xtable(p.ef.df,digits=3)
+align(pef.t) <- "ccc"
+print(pef.t,comment = FALSE,include.rownames =TRUE,scalebox=0.9,sanitize.text.function = function(x){x},booktabs=TRUE,floating=FALSE)
+@
+}{ \caption{Portafolio Eficiente sin cortos Retorno Mensual y Anualizado} }
+\end{floatrow} 
+\end{figure} 
+\vspace{-15pt}
+\subsection{Portafolio Eficiente Retorno Objetivo 9$\%$ anual (Combinación T-Bill y Portafolio de la Tangente sin cortos)}
+<<trtll.09,echo=FALSE>>=
+# ponderaciones T-Bill y activos con Riesgo
+xt.vec <- t.port.n$weights
+xt <- (target.return2-rf.m)/(mu.tns-rf.m)  # pesos Activos con Riesgo
+x.rf  <- 1-xt    # pesos T-Bill
+x.rassets <- xt*xt.vec   # pesos por activos individuales
+mut <- xt*mu.tns + x.rf*rf.m
+sigt <- xt*sig.tns
+
+xtll.vec <- c(T.bill=x.rf,x.rassets)
+xt.df <- as.data.frame(xtll.vec)
+xt.df$activos <- row.names(xt.df)
+xt.dfr <- data.frame(activos=xt.df[,2],pesos=xt.df[,1]) # pesos
+
+# Retornos, Desviacion estandar Portafolio eficiente con cortos (mensuales)
+e2tll.VaRns.05 <- (exp(mut+sigt*qnorm(0.05))-1)*100000
+e2tll.VaRns.01 <- (exp(mut +sigt*qnorm(0.01))-1)*100000
+eftll.sharpe <- (mut - rf.m)/sigt
+ef2tllns.df <- rbind(mut,sigt,e2tll.VaRns.05 ,e2tll.VaRns.01,eftll.sharpe)
+
+# Retornos, Desviacion estandar Portafolio eficiente con cortos (anuales)
+mut.y <- mut*12
+sigt.y <- sqrt(sigt*12)
+e2tll.VaRns.05.y <- (exp(mut.y+sigt.y*qnorm(0.05))-1)*100000
+e2tll.VaRns.01.y <- (exp(mut.y +sigt.y*qnorm(0.01))-1)*100000
+eftll.sharpe.y <- (mut.y - rf)/sigt.y
+ef2tllns.df.y <- rbind(mut.y,sigt.y,e2tll.VaRns.05.y ,
+                     e2tll.VaRns.01.y,eftll.sharpe.y)
+
+# tabla portafolio eficiente retorno objetivo 9%
+peftll.df <- data.frame(r.mensuales=ef2tllns.df[,1] ,r.anuales=ef2tllns.df.y[,1])
+peftll.df$r.mensuales[c(1,2,5)] <- percent(as.numeric(as.character(peftll.df$r.mensuales[c(1,2,5)])))
+peftll.df$r.mensuales[c(3,4)] <- dollar(as.numeric(as.character(peftll.df$r.mensuales[c(3,4)])))
+peftll.df$r.anuales[c(1,2,5)] <- percent(as.numeric(as.character(peftll.df$r.anuales[c(1,2,5)])))
+peftll.df$r.anuales[c(3,4)] <- dollar(as.numeric(as.character(peftll.df$r.anuales[c(3,4)])))
+@
+\vspace{-15pt}
+\begin{figure}[!h]
+\CenterFloatBoxes   % alinea las cajas verticalmente
+\begin{floatrow}
+\ffigbox{
+<<pef.tbill09,echo=FALSE, warning=FALSE,cache=TRUE>>=
+ggplot(xt.dfr,aes(x=activos,y=pesos)) +
+  geom_bar(stat = "identity", fill = "navy") + 
+  geom_text(aes(label = paste(round(pesos,2) * 100, "%"),
+                vjust = ifelse(pesos >= 0, -0.5, 1.2))) +
+  scale_y_continuous("Pesos del Portafolio", labels = percent,
+                     breaks=pretty_breaks(n=8)) +
+  theme(axis.title.x = element_blank(),
+        title=element_text(vjust=0.9)) +
+  ggtitle("Portafolio Eficiente con T-Bill")
+@
+}{\caption{Portafolio Eficiente con Retorno Objetivo del 9$\%$ anual y activo libre de riesgo} }
+\capbtabbox{
+<<pef.tbill09.t,echo=FALSE,results='asis'>>=
+colnames(peftll.df) <- c("R. Mensual","R. Anualizado")
+rownames(peftll.df) <- c("E[Rp]","SD[Rp]","VaR 5$\\%$","VaR 1$\\%$","Sharpe")
+peftll.t <- xtable(peftll.df)
+align(peftll.t) <- "ccc"
+print(peftll.t,comment=F,scalebox=0.9,include.rownames =TRUE,
+      sanitize.rownames.function = function(x){x},booktabs=TRUE,floating=FALSE)
+@
+}{ \caption{Portafolio Eficiente con T-Bill Retorno Mensual y Anualizado} }
+\end{floatrow} 
+\end{figure} 
+
+
+\section{Risk Budgeting - Portafolio Eficiente(E[Rp]=9$\%$)}
+<<risk.b,echo=FALSE,warning=FALSE,message=FALSE>>=
+efp.w <- ef2.nsh$weights
+mcr.vol = sigma.mat%*%efp.w/sd.ef2
+cr.vol = efp.w * mcr.vol
+pcr.vol = cr.vol /sd.ef2
+sdrr <- cbind(mcr.vol, cr.vol, pcr.vol)  
+  
+# usando la funcion StdDev() de performance analytics
+SDRC <- StdDev(asset.r, portfolio_method="component",
+        weights=efp.w)
+  
+VaRRC <- VaR(asset.r,portfolio_method="component",
+     weights=efp.w)
+ESRC <- ES(asset.r,portfolio_method="component",
+    weights=efp.w)
+
+Inv.inicial <- 100000
+weight <- efp.w
+dollar.All <- weight*Inv.inicial
+SD.assets <- sigmahat.vals
+AssetVaR <- qnorm(0.05,muhat.vals,sigmahat.vals)
+cVaR <- VaR(asset.r,portfolio_method="component",
+            weights=efp.w)$contribution
+cVaR.dollar <- cVaR*Inv.inicial
+pcVaR <- VaR(asset.r,portfolio_method="component",
+             weights=efp.w)$pct_contrib_MVaR
+
+NormalVaR.Rpt <- data.frame(Asignacion=dollar(dollar.All),
+            Pesos=percent(weight),SD=percent(SD.assets),VaR=percent(AssetVaR*(-1)),
+            cVaR=percent(cVaR),dcVaR=dollar(cVaR.dollar),pcVaR=percent(pcVaR))
+
+Portfolio.sum <- data.frame(Asignacion=dollar(sum(dollar.All)),Pesos=percent(sum(weight))
+                ,VaR=percent(0),SD=percent(0),
+                   cVaR=percent(sum(cVaR)),dcVaR=dollar(sum(cVaR.dollar)),
+                pcVaR=percent(sum(pcVaR )))
+VaR.Report <- rbind(NormalVaR.Rpt,Portfolio.sum)
+@
+
+<<VaR.report,echo=FALSE,results='asis',warning=FALSE,message=FALSE>>=
+colnames(VaR.Report) <- c("Asignación$\\$$","Pesos","SD","VaR","cVaR","$\\$$cVaR","pcVaR")
+rownames(VaR.Report) <- c(asset.names,"Portafolio")
+VaR.Report.t <- xtable(VaR.Report)
+align(VaR.Report.t) <- "cccccccc"
+print(VaR.Report.t,comment = FALSE,include.rownames =TRUE,scalebox=0.9,sanitize.colnames.function = function(x){x},booktabs=TRUE,hline.after=c(-1,0,6,7),caption="Reporte de 95\\% VaR ")
+@
+
+
+
+
+
+\newpage
+\section{Apéndice}
+\textbf{Apéndice I }
+<<tabla.r, echo=FALSE,results='asis',warning=FALSE,cache=TRUE>>=
+assetr.df <- data.frame(date=index(asset.r),coredata(asset.r),stringsAsFactors=FALSE)
+assetr.df$date <- as.character(assetr.df$date)    # se convierte yearmon - character
+asset.t <- xtable(assetr.df,caption="Retornos Mensuales 2009-2013",label="tabrescaled",digits=3)
+print(asset.t,comment = FALSE,include.rownames =TRUE,scalebox=0.58)
+@
+\newpage
+
+\end{document}

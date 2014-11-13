@@ -1,0 +1,103 @@
+################################################################################
+# risk budgeting
+################################################################################
+
+riskBudgetSD <- function(x.A, x.B, mu.A, mu.B, sig2.A, sig2.B, sig.AB) {
+  sig.p = sqrt(x.A^2 * sig2.A + x.B^2 * sig2.B + 2*x.A*x.B*sig.AB)
+  mcr.A = (x.A*sig2.A + x.B*sig.AB)/sig.p
+  mcr.B = (x.B*sig2.B + x.A*sig.AB)/sig.p
+  cr.A = x.A*mcr.A
+  cr.B = x.B*mcr.B
+  pcr.A = cr.A/sig.p
+  pcr.B = cr.B/sig.p
+  ans = list(sig.p=sig.p,
+             x=c(x.A, x.B),
+             mcr = c(mcr.A, mcr.B),
+             cr = c(cr.A, cr.B),
+             pcr = c(pcr.A, pcr.B))
+  return(ans)
+}             
+x.A = 0.5
+x.B = 0.5
+rb.sd = riskBudgetSD(x.A, x.B, mu.A, mu.B, sig2.A, sig2.B, sig.AB)             
+rb.sd
+x.A = 1.5
+x.B = -0.5
+rb.sd = riskBudgetSD(x.A, x.B, mu.A, mu.B, sig2.A, sig2.B, sig.AB)             
+rb.sd
+
+riskBudgetVaR <- function(x.A, x.B, mu.A, mu.B, sig2.A, sig2.B, sig.AB, 
+                          w0=100000, alpha=0.05) {
+  mu.p = x.A*mu.A + x.B*mu.B
+  sig.p = sqrt(x.A^2 * sig2.A + x.B^2 * sig2.B + 2*x.A*x.B*sig.AB)
+  VaR.p = (mu.p + sig.p*qnorm(0.05))*w0
+  mcr.sig.A = (x.A*sig2.A + x.B*sig.AB)/sig.p
+  mcr.sig.B = (x.B*sig2.B + x.A*sig.AB)/sig.p
+  mcr.A = (mu.A + mcr.sig.A*qnorm(alpha))*w0
+  mcr.B = (mu.B + mcr.sig.B*qnorm(alpha))*w0
+  cr.A = x.A*mcr.A
+  cr.B = x.B*mcr.B
+  pcr.A = cr.A/VaR.p
+  pcr.B = cr.B/VaR.p
+  ans = list(VaR.p=VaR.p,
+             x=c(x.A, x.B),
+             mcr = c(mcr.A, mcr.B),
+             cr = c(cr.A, cr.B),
+             pcr = c(pcr.A, pcr.B))
+  return(ans)
+}   
+x.A = 0.5
+x.B = 0.5
+rb.VaR = riskBudgetVaR(x.A, x.B, mu.A, mu.B, sig2.A, sig2.B, sig.AB)             
+rb.VaR
+x.A = 1.5
+x.B = -0.5
+rb.VaR = riskBudgetVaR(x.A, x.B, mu.A, mu.B, sig2.A, sig2.B, sig.AB)             
+rb.VaR
+
+####################################
+
+#
+# portfolio risk measures
+#
+
+# equally weighted portfolio of MSFT and GSPC
+port.ret = 0.5*MSFT.ret + 0.5*GSPC.ret
+colnames(port.ret) = "port"
+# plot(port.ret)
+
+mean(port.ret)
+sd(port.ret)
+sd(as.numeric(port.ret))
+
+# computing portfolio vol using covariance matrix
+Sigma.hat = cov(MSFT.GSPC.ret)
+w = c(0.5, 0.5)
+sqrt(t(w)%*%Sigma.hat%*%w)
+
+# estimating contributions to Vol
+sigma.p.hat = as.numeric(sqrt(t(w)%*%Sigma.hat%*%w))
+mcr.vol = Sigma.hat %*% w / sigma.p.hat
+cr.vol = w * mcr.vol
+pcr.vol = cr.vol / sigma.p.hat
+cbind(mcr.vol, cr.vol, pcr.vol)
+
+# check
+sigma.p.hat
+sum(cr.vol)
+sum(pcr.vol)
+
+# using PerformanceAnalytics function StdDev
+StdDev(MSFT.GSPC.ret, portfolio_method="component", 
+       weights=c(0.5, 0.5))
+
+#
+# nonparametric measures of risk budgets
+#
+
+# VaR
+VaR(port.ret, p=0.95, method="historical")
+VaR(port.ret, p=0.99, method="historical")
+# ES
+ES(port.ret, p=0.95, method="historical")
+ES(port.ret, p=0.99, method="historical")
